@@ -19,7 +19,7 @@ namespace LotteryApi.Controllers
             return Ok(donors);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<DonorDto>>> GetDonorsByIdAsync(int id)
+        public async Task<ActionResult<DonorDto>> GetDonorsByIdAsync(int id)
         {
             var donor = await _donorService.GetDonorsByIdAsync(id);
             if (donor == null)

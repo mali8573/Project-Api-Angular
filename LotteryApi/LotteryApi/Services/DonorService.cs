@@ -34,7 +34,7 @@ namespace LotteryApi.Services
                 Name = donor.Name,
                 Email = donor.Email,
                 Phone = donor.Phone,
-                Gifts = []
+                
             };
 
             var createDonor=await _donorRepository.CreateDonorsAsync(newDonor);
