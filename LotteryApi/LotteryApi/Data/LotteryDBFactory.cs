@@ -5,6 +5,7 @@ namespace LotteryApi.Data
     public class LotteryDBFactory
     {
         private const string ConnectionString = "Server=DESKTOP-1L8084V\\SQLEXPRESS;DataBase=LotteryDB;Integrated Security=SSPI;" +
+                    //private const string ConnectionString = "Server=Srv2\\pupils;DataBase=LotteryDB;Integrated Security=SSPI;" +
 
     "Persist Security Info=False;TrustServerCertificate=true";
 

@@ -6,23 +6,55 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LotteryApi.Migrations
 {
     /// <inheritdoc />
-    public partial class initialCreate : Migration
+    public partial class initalCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Donors",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Tz = table.Column<int>(type: "int", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Tz = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Donors", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Packages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    QtyClassicCards = table.Column<int>(type: "int", nullable: false),
+                    QtySpecialCards = table.Column<int>(type: "int", nullable: false),
+                    QtyPrimumCards = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Packages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -31,7 +63,6 @@ namespace LotteryApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -51,9 +82,9 @@ namespace LotteryApi.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CardAmount = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    PrizeQuantity = table.Column<int>(type: "int", nullable: false),
                     CardPrice = table.Column<int>(type: "int", nullable: false),
                     PictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DonorId = table.Column<int>(type: "int", nullable: false)
@@ -61,6 +92,12 @@ namespace LotteryApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Gifts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Gifts_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Gifts_Donors_DonorId",
                         column: x => x.DonorId,
@@ -96,7 +133,8 @@ namespace LotteryApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ParticipantId = table.Column<int>(type: "int", nullable: false)
+                    ParticipantId = table.Column<int>(type: "int", nullable: false),
+                    SumPrice = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -110,27 +148,54 @@ namespace LotteryApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Winners",
+                name: "PackagesInOrder",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ParticipantId = table.Column<int>(type: "int", nullable: false),
-                    GiftId = table.Column<int>(type: "int", nullable: false)
+                    PackageId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    PriceAtPurchase = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Winners", x => x.Id);
+                    table.PrimaryKey("PK_PackagesInOrder", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Winners_Gifts_GiftId",
-                        column: x => x.GiftId,
-                        principalTable: "Gifts",
+                        name: "FK_PackagesInOrder_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Winners_Users_ParticipantId",
-                        column: x => x.ParticipantId,
-                        principalTable: "Users",
+                        name: "FK_PackagesInOrder_Packages_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "Packages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PackagesInCart",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PackageId = table.Column<int>(type: "int", nullable: false),
+                    CartId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PackagesInCart", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PackagesInCart_Packages_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "Packages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PackagesInCart_ShoppingCarts_CartId",
+                        column: x => x.CartId,
+                        principalTable: "ShoppingCarts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -142,7 +207,10 @@ namespace LotteryApi.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GiftId = table.Column<int>(type: "int", nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: false)
+                    PackageInOrderId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    PriceAtPurchase = table.Column<int>(type: "int", nullable: false),
+                    IsWinner = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -159,29 +227,12 @@ namespace LotteryApi.Migrations
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Packages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<int>(type: "int", nullable: false),
-                    QtyClassicCards = table.Column<int>(type: "int", nullable: false),
-                    QtySpecialCards = table.Column<int>(type: "int", nullable: false),
-                    QtyPrimumCards = table.Column<int>(type: "int", nullable: false),
-                    OrderModelId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Packages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Packages_Orders_OrderModelId",
-                        column: x => x.OrderModelId,
-                        principalTable: "Orders",
-                        principalColumn: "Id");
+                        name: "FK_GiftsInOrder_PackagesInOrder_PackageInOrderId",
+                        column: x => x.PackageInOrderId,
+                        principalTable: "PackagesInOrder",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -191,6 +242,7 @@ namespace LotteryApi.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GiftId = table.Column<int>(type: "int", nullable: false),
+                    PackageInCartId = table.Column<int>(type: "int", nullable: false),
                     CartId = table.Column<int>(type: "int", nullable: false),
                     Qty = table.Column<int>(type: "int", nullable: false)
                 },
@@ -204,12 +256,23 @@ namespace LotteryApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_GiftsInCart_PackagesInCart_PackageInCartId",
+                        column: x => x.PackageInCartId,
+                        principalTable: "PackagesInCart",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_GiftsInCart_ShoppingCarts_CartId",
                         column: x => x.CartId,
                         principalTable: "ShoppingCarts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Gifts_CategoryId",
+                table: "Gifts",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Gifts_DonorId",
@@ -227,6 +290,11 @@ namespace LotteryApi.Migrations
                 column: "GiftId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GiftsInCart_PackageInCartId",
+                table: "GiftsInCart",
+                column: "PackageInCartId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GiftsInOrder_GiftId",
                 table: "GiftsInOrder",
                 column: "GiftId");
@@ -237,28 +305,38 @@ namespace LotteryApi.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GiftsInOrder_PackageInOrderId",
+                table: "GiftsInOrder",
+                column: "PackageInOrderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_ParticipantId",
                 table: "Orders",
                 column: "ParticipantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Packages_OrderModelId",
-                table: "Packages",
-                column: "OrderModelId");
+                name: "IX_PackagesInCart_CartId",
+                table: "PackagesInCart",
+                column: "CartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PackagesInCart_PackageId",
+                table: "PackagesInCart",
+                column: "PackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PackagesInOrder_OrderId",
+                table: "PackagesInOrder",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PackagesInOrder_PackageId",
+                table: "PackagesInOrder",
+                column: "PackageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShoppingCarts_ParticipantId",
                 table: "ShoppingCarts",
-                column: "ParticipantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Winners_GiftId",
-                table: "Winners",
-                column: "GiftId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Winners_ParticipantId",
-                table: "Winners",
                 column: "ParticipantId");
         }
 
@@ -272,25 +350,31 @@ namespace LotteryApi.Migrations
                 name: "GiftsInOrder");
 
             migrationBuilder.DropTable(
-                name: "Packages");
-
-            migrationBuilder.DropTable(
-                name: "Winners");
-
-            migrationBuilder.DropTable(
-                name: "ShoppingCarts");
-
-            migrationBuilder.DropTable(
-                name: "Orders");
+                name: "PackagesInCart");
 
             migrationBuilder.DropTable(
                 name: "Gifts");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "PackagesInOrder");
+
+            migrationBuilder.DropTable(
+                name: "ShoppingCarts");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Donors");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Packages");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

@@ -14,13 +14,27 @@ namespace LotteryApi.Data
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<GiftInCartModel> GiftsInCart { get; set; }
         public DbSet<ShoppingCartModel> ShoppingCarts { get; set; }
-        public DbSet<WinnerModel> Winners { get; set; }
-
+        public DbSet<CategoryModel> Categories { get; set; }
+        public DbSet<PackageInCartModel> PackagesInCart { get; set; }
+        public DbSet<PackageInOrderModel> PackagesInOrder { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OrderModel>()
-                .HasMany(o => o.Packages)
-                .WithMany(); 
+            base.OnModelCreating(modelBuilder);
+
+            // פתרון לשגיאת ה-Cascade במתנות שבתוך חבילה בסל
+            modelBuilder.Entity<GiftInCartModel>()
+                .HasOne(g => g.PackageInCart)
+                .WithMany(p => p.GiftsInPackage)
+                .HasForeignKey(g => g.PackageInCartId)
+                .OnDelete(DeleteBehavior.Restrict); // מונע מחיקה כפולה בשרשרת
+
+            // פתרון למניעת שגיאה דומה במתנות שבתוך חבילה בהזמנה
+            modelBuilder.Entity<GiftInOrderModel>()
+                .HasOne(g => g.PackageInOrder)
+                .WithMany(p => p.GiftsInPackage)
+                .HasForeignKey(g => g.PackageInOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
+
     }
 }
