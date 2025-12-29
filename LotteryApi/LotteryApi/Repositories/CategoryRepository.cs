@@ -10,7 +10,7 @@ namespace LotteryApi.Repositories
         private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
         public async Task<IEnumerable<CategoryModel>> GetCategoriesAsync()
         {
-            return await _lotteryContext.Categories.ToListAsync();
+            return await _lotteryContext.Categories.Include(c=>c.Gifts).ToListAsync();
         }
         public async Task<CategoryModel?> GetCategoryByIdAsync(int id)
         {
