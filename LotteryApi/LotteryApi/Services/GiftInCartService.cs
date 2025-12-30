@@ -68,7 +68,7 @@ namespace LotteryApi.Services
             }
             else
             {
-                if (existing.Qty - giftInCart.Qty < 0)
+                if (existing.Qty + giftInCart.Qty > 0)
                 {
                     existing.Qty += giftInCart.Qty;
                     var updatedGiftInCart = await _giftInCartRepository.UpdateGiftAsync(existing);
