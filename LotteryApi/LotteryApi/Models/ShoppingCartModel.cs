@@ -15,6 +15,6 @@ namespace LotteryApi.Models
         public ICollection<GiftInCartModel> GiftsInShoppingCart { get; set; } = new List<GiftInCartModel>();
 
         [Required]
-        public int SumPrice { get; set; }
+        public int SumPrice { get; set; }= 0;
     }
 }
