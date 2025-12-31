@@ -7,10 +7,13 @@ namespace LotteryApi.Services
     public class PackageInCartService
     {
         private readonly PackageInCartRepository _packageInCartRepository = new();
+        private readonly PackageRepository _packageRepository = new();
+        private readonly ShoppingCartRepository _ShoppingCartRepository = new();
 
         public async Task<PackageInCartDto?> GetPackageInCartByIdAsync(int id)
         {
             var packageInCart = await _packageInCartRepository.GetPackageInCartByIdAsync(id);
+           
             return packageInCart != null ? new PackageInCartDto 
             { Id = packageInCart.Id,
             PackageId = packageInCart.PackageId,
@@ -30,7 +33,10 @@ namespace LotteryApi.Services
 
         public async Task<PackageInCartDto> CreatePackageInCartAsync(PackageInCartCreateDto packageInCart)
         {
-            var newPackageInCart = new PackageInCartModel()
+            var package = await _packageRepository.GetPackageByIdAsync(packageInCart.PackageId);
+            if (package == null)
+                return null;
+             var newPackageInCart = new PackageInCartModel()
             {
                 PackageId = packageInCart.PackageId,
                 //לשנות השרת צריך מעצמו לדעת
@@ -39,6 +45,12 @@ namespace LotteryApi.Services
             };
 
             var createPackageInCart = await _packageInCartRepository.CreatePackageInCartAsync(newPackageInCart);
+            var cart = await _ShoppingCartRepository.GetShoppingCartByIdAsync(1);
+            if (cart != null)
+            {
+                cart.SumPrice += package.Price;
+                await _ShoppingCartRepository.UpdateShoppingCartAsync(cart);
+            }
             return new PackageInCartDto
             {
                 Id = createPackageInCart.Id,
@@ -59,7 +71,20 @@ namespace LotteryApi.Services
         }
         public async Task<bool> DeletePackageInCartAsync(int id)
         {
+            var packageInCart = await _packageInCartRepository.GetPackageInCartByIdAsync(id);
+            if (packageInCart == null)
+                return false;
+            var price=packageInCart?.Package?.Price??0;
+            var cart = await _ShoppingCartRepository.GetShoppingCartByIdAsync(1);
+            if (cart != null)
+            {
+                cart.SumPrice -= price;
+                await _ShoppingCartRepository.UpdateShoppingCartAsync(cart);
+            }
+
             return await _packageInCartRepository.DeletePackageInCartAsync(id);
+          
+
         }
     }
 }

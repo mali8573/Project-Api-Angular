@@ -13,6 +13,7 @@ namespace LotteryApi.Repositories
             return await _lotteryContext.PackagesInCart
                 .Include(p => p.Package)
                 .Include(p => p.GiftsInPackage)
+                 .ThenInclude(g=> g.Gift)
                .FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task<PackageInCartModel> CreatePackageInCartAsync(PackageInCartModel packageInCart)

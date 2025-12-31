@@ -18,7 +18,8 @@ namespace LotteryApi.Dtos
     {
         [Required]
         public int ParticipantId { get; set; }
-        [Required]
-        public int SumPrice { get; set; } = 0;
+       
+      
     }
+  
 }
