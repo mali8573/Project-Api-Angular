@@ -18,8 +18,8 @@ namespace LotteryApi.Models
         public int OrderId { get; set; }
         [ForeignKey("OrderId")]
         public OrderModel Order { get; set; }
-        [Required]
-        public int PriceAtPurchase { get; set; }
+        //[Required]
+        //public int PriceAtPurchase { get; set; }
         public bool? IsWinner { get; set; } = false;
     }
 }
