@@ -11,7 +11,6 @@ namespace LotteryApi.Models
         [ForeignKey("ParticipantId")]
         public UserModel Participant { get; set; }
         public ICollection<PackageInOrderModel> PackagesInOrder { get; set; } = new List<PackageInOrderModel>();
-        public ICollection<GiftInOrderModel> GiftsInOrder { get; set; } = new List<GiftInOrderModel>();
 
         [Required]
         public int SumPrice { get; set; }
