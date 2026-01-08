@@ -1,4 +1,5 @@
 ﻿using LotteryApi.Dtos;
+using LotteryApi.Enums;
 using LotteryApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +53,47 @@ namespace LotteryApi.Controllers
                 return NotFound(new { message = $"Gift with ID {id} not found." });
             }
             return NoContent();
+        }
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<GiftDto>>> SearchGifts(
+    [FromQuery] string? giftName,
+  [FromQuery] string? donorName,
+  [FromQuery] int? minPurchasers)
+        {
+            var results = await _giftService.SearchGiftsAsync(giftName, donorName, minPurchasers);
+
+            if (results == null || !results.Any())
+            {
+                return NotFound("לא נמצאו מתנות התואמות לחיפוש.");
+            }
+
+            return Ok(results);
+        }
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<GiftDto>>> FilterGifts(
+  [FromQuery] int? categoryId,
+  [FromQuery] CardPriceEnum? priceType)
+        {
+            var results = await _giftService.FilteredGiftsAsync(categoryId, priceType);
+
+            if (results == null || !results.Any())
+            {
+                return NotFound("לא נמצאו מתנות התואמות לחיפוש😫😪");
+            }
+
+            return Ok(results);
+        }
+        [HttpGet("sort")]
+        public async Task<ActionResult<IEnumerable<GiftDto>>> SortedGiftsExpensiveAsync([FromQuery] string sortBy)
+        {
+            var results = await _giftService.SortedGiftsExpensiveAsync(sortBy);
+
+            if (results == null || !results.Any())
+            {
+                return NotFound("לא נמצאו מתנות התואמות לחיפוש😫😪");
+            }
+
+            return Ok(results);
         }
     }
 }

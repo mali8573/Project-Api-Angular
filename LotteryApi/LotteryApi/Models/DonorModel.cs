@@ -5,8 +5,7 @@ namespace LotteryApi.Models
     public class DonorModel
     {
         public int Id { get; set; }
-        public string? Tz { get; set; }
-        
+        [Required]
         public string Name { get; set; }
         [Required,Phone]
         public string Phone { get; set; }

@@ -24,6 +24,8 @@ namespace LotteryApi.Models
         public int DonorId { get; set; }
         [ForeignKey("DonorId")]
         public DonorModel Donor { get; set; }
-      
+        public ICollection<GiftInOrderModel> GifPurchased { get; set; } = new List<GiftInOrderModel>();
+
+
     }
 }

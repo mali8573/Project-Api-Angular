@@ -20,6 +20,6 @@ namespace LotteryApi.Models
         public OrderModel Order { get; set; }
         //[Required]
         //public int PriceAtPurchase { get; set; }
-        public bool? IsWinner { get; set; } = false;
+        public bool IsWinner { get; set; } = false;
     }
 }

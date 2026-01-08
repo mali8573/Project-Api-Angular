@@ -33,56 +33,56 @@ namespace LotteryApi.Services
             } : null;
         }
 
-        public async Task<List<PackageInOrderDto>> CreatePackagesAndGiftsInCartAsync(ShoppingCartDto shoppingCartDto, int orderId)
-        {
+        //public async Task<List<PackageInOrderDto>> CreatePackagesAndGiftsInCartAsync(ShoppingCartDto shoppingCartDto, int orderId)
+        //{
 
-            var cart = await _ShoppingCartRepository.GetShoppingCartByIdAsync(shoppingCartDto.Id);
-            if (cart == null)
-            {
-                return null;
-            }
-            var packageToOrder = cart.PackagesInShoppingCart?.Select(p => new PackageInOrderModel
-            {
-                PackageId = p.PackageId,
-                Package = p.Package,
-                PriceAtPurchase = p.Package?.Price ?? 0,
-                OrderId = orderId,
-                GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInOrderModel
-                {
-                    GiftId = g.GiftId,
-                    Gift = g.Gift,
-                    OrderId = orderId,
-                    IsWinner = false
-                }).ToList()
-            }).ToList();
-            if (packageToOrder == null || !packageToOrder.Any())
-            {
-                return null;
-            }
-            var isSaved = await _packageInOrderRepository.CreatePackagesAndGiftsInCartAsync(packageToOrder);
+        //    var cart = await _ShoppingCartRepository.GetShoppingCartByIdAsync(shoppingCartDto.Id);
+        //    if (cart == null)
+        //    {
+        //        return null;
+        //    }
+        //    var packageToOrder = cart.PackagesInShoppingCart?.Select(p => new PackageInOrderModel
+        //    {
+        //        PackageId = p.PackageId,
+        //        Package = p.Package,
+        //        PriceAtPurchase = p.Package?.Price ?? 0,
+        //        OrderId = orderId,
+        //        GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInOrderModel
+        //        {
+        //            GiftId = g.GiftId,
+        //            Gift = g.Gift,
+        //            OrderId = orderId,
+        //            IsWinner = false
+        //        }).ToList()
+        //    }).ToList();
+        //    if (packageToOrder == null || !packageToOrder.Any())
+        //    {
+        //        return null;
+        //    }
+        //    var isSaved = await _packageInOrderRepository.CreatePackagesAndGiftsInCartAsync(packageToOrder);
 
-            if (!isSaved) return null;
+        //    if (!isSaved) return null;
 
-            var resultDto = packageToOrder.Select(p => new PackageInOrderDto
-            {
-                PackageId = p.PackageId,
-                PackageName = p.Package?.Name,
-                PriceAtPurchase = p.PriceAtPurchase,
+        //    var resultDto = packageToOrder.Select(p => new PackageInOrderDto
+        //    {
+        //        PackageId = p.PackageId,
+        //        PackageName = p.Package?.Name,
+        //        PriceAtPurchase = p.PriceAtPurchase,
 
-                GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInOrderDto
-                {
-                    Id = g.Id,
-                    GiftId = g.GiftId,
-                    GiftName = g.Gift?.Name,
-                    GiftPictureUrl = g.Gift?.PictureUrl,
-                   GiftCardPrice = g.Gift?.CardPrice.ToString(),
-                    IsWinner = g.IsWinner
-                }).ToList() ?? []
-            }).ToList();
+        //        GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInOrderDto
+        //        {
+        //            Id = g.Id,
+        //            GiftId = g.GiftId,
+        //            GiftName = g.Gift?.Name,
+        //            GiftPictureUrl = g.Gift?.PictureUrl,
+        //           GiftCardPrice = g.Gift?.CardPrice.ToString(),
+        //            IsWinner = g.IsWinner
+        //        }).ToList() ?? []
+        //    }).ToList();
 
 
-            return resultDto;
-        }
+        //    return resultDto;
+        //}
     }
 }
 

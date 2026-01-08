@@ -18,6 +18,6 @@ namespace LotteryApi.Models
         public string Address { get; set; }
         [Required]
         public UserRoleEnum Role { get; set; } = UserRoleEnum.Participant;
-
+        public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
     }
 }

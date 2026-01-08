@@ -1,62 +1,102 @@
-﻿//using LotteryApi.Dtos;
-//using LotteryApi.Models;
-//using LotteryApi.Repositories;
+﻿using LotteryApi.Dtos;
+using LotteryApi.Models;
+using LotteryApi.Repositories;
 
-//namespace LotteryApi.Services
-//{
-//    public class OrderService
-//    {
-//        private readonly OrderRepository _orderRepository = new();
+namespace LotteryApi.Services
+{
+    public class OrderService
+    {
+        private readonly OrderRepository _orderRepository = new();
+        private readonly ShoppingCartRepository _shoppingCartRepository = new();
+        public async Task<IEnumerable<OrderDto>> GetOrdersAsync()
+        {
+            var orders = await _orderRepository.GetOrdersAsync();
+            return orders.Select(o => new OrderDto
+            {
+
+                Id = o.Id,
+                ParticipantId = o.ParticipantId,
+                ParticipantName = o.Participant?.Name,
+                SumPrice = o.SumPrice,
+                date = o.date,
+                PackagesInOrder = o.PackagesInOrder?.Select(p => new PackageInOrderDto
+                {
+                    PackageId = p.PackageId,
+                    PackageName = p.Package?.Name,
+                    PriceAtPurchase = p.PriceAtPurchase,
+
+                    GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInOrderDto
+                    {
+                        Id = g.Id,
+                        GiftId = g.GiftId,
+                        GiftName = g.Gift?.Name,
+                        GiftPictureUrl = g.Gift?.PictureUrl,
+                        GiftCardPrice = g.Gift?.CardPrice.ToString(),
+                        IsWinner = g.IsWinner
+                    }).ToList() ?? new List<GiftInOrderDto>()
+                }).ToList() ?? new List<PackageInOrderDto>()
+            }).ToList();
+        }
 
 
-//        public async Task<ShoppingCartDto?> GetOrderByIdAsync(int id)
-//        {
-//            var order = await _orderRepository.GetOrderByIdAsync(id);
+        
 
-//            return order != null ? new ShoppingCartDto
-//            {
-//                Id = shoppingCart.Id,
-//                ParticipantId = shoppingCart.ParticipantId,
-//                ParticipantName = shoppingCart.Participant?.Name,
-//                PackagesInShoppingCart = shoppingCart.PackagesInShoppingCart?.Select(p => new PackageInCartDto
-//                {
-//                    Id = p.Id,
-//                    PackageId = p.PackageId,
-//                    PackageName = p.Package?.Name,
-//                    PackagePrice = p.Package?.Price ?? 0,
-//                    GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInCartDto
-//                    {
-//                        Id = g.Id,
-//                        GiftId = g.GiftId,
-//                        GiftName = g.Gift?.Name,
-//                        giftPictureUrl = g.Gift?.PictureUrl,
-//                        giftCardPrice = g.Gift?.CardPrice.ToString(),
-//                        Qty = g.Qty
-//                    }).ToList() ?? []
-//                }).ToList() ?? [],
-//                SumPrice = shoppingCart.SumPrice
-//            } : null;
-//        }
+        public async Task<OrderDto?> GetOrderByIdAsync(int id)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(id);
 
-//        public async Task<ShoppingCartDto> CreateShoppingCartAsync(ShoppingCartCreateDto shoppingcart)
-//        {
-//            var newShoppingCart = new ShoppingCartModel()
-//            {
+            return order != null ? new OrderDto
+            {
+                Id = order.Id,
+                ParticipantId = order.ParticipantId,
+                ParticipantName = order.Participant?.Name,
+                SumPrice = order.SumPrice,
+                date = order.date,
+                PackagesInOrder = order.PackagesInOrder?.Select(p => new PackageInOrderDto { 
+                       PackageId = p.PackageId,
+                      PackageName = p.Package?.Name,
+                PriceAtPurchase = p.PriceAtPurchase,
 
-//                ParticipantId = shoppingcart.ParticipantId,
+                GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInOrderDto
+                {
+                    Id = g.Id,
+                    GiftId = g.GiftId,
+                    GiftName = g.Gift?.Name,
+                    GiftPictureUrl = g.Gift?.PictureUrl,
+                    GiftCardPrice = g.Gift?.CardPrice.ToString(),
+                    IsWinner = g.IsWinner
+                }).ToList() ?? new List<GiftInOrderDto>()
+                }).ToList() ?? new List<PackageInOrderDto>()
+            } : null;
+           
+        }
 
-//            };
+        public async Task<OrderDto> CreateShoppingCartAsync(ShoppingCartDto shoppingcart)
+        {
+            var newOrder = new OrderModel()
+            {
 
-//            var createShoppingCart = await _shoppingCartRepository.CreateShoppingCartAsync(newShoppingCart);
-//            return createShoppingCart != null ? new ShoppingCartDto
-//            {
-//                Id = createShoppingCart.Id,
-//                ParticipantId = createShoppingCart.ParticipantId,
-//                ParticipantName = createShoppingCart.Participant?.Name,
-//                PackagesInShoppingCart = [],
-//                SumPrice = 0
+                ParticipantId = shoppingcart.ParticipantId,
+                SumPrice = shoppingcart.SumPrice,
+                date = DateOnly.FromDateTime(DateTime.UtcNow),
+                PackagesInOrder = shoppingcart.PackagesInShoppingCart.Select(p => new PackageInOrderModel
+                {
+                    PackageId = p.PackageId,
+                    
+                    PriceAtPurchase = p.PackagePrice,
 
-//            } : null;
-//        }
-//    }
-//}
+                    GiftsInPackage = p.GiftsInPackage.Select(g => new GiftInOrderModel
+                    {
+                        GiftId = g.GiftId,
+                        IsWinner =false
+                    }).ToList()
+                }).ToList()
+
+            };
+
+            var createOrder = await _orderRepository.CreateOrderAsync(newOrder);
+            await _shoppingCartRepository.EmptyCartAsync(shoppingcart.Id);
+            return await  GetOrderByIdAsync(createOrder.Id);
+        }
+    }
+}

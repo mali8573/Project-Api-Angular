@@ -14,7 +14,8 @@ namespace LotteryApi.Dtos
         public string GiftPictureUrl { get; set; }
         public string GiftCardPrice { get; set; }
         //public int PriceAtPurchase { get; set; }
-        public bool? IsWinner { get; set; } = false;
+        public bool IsWinner { get; set; } = false;
     }
-  
+   
+
 }

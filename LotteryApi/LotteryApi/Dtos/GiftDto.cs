@@ -17,7 +17,10 @@ namespace LotteryApi.Dtos
         public string? PictureUrl { get; set; }
         public int DonorId { get; set; }
         public string DonorName { get; set; }
-       
+        public ICollection<GiftPurchaserDto> GifPurchased { get; set; } = new List<GiftPurchaserDto>();
+
+        public int PurchasersCount { get; set; }
+
     }
     public class GiftCreateDto
     {

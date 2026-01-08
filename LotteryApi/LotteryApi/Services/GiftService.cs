@@ -1,4 +1,5 @@
 ﻿using LotteryApi.Dtos;
+using LotteryApi.Enums;
 using LotteryApi.Models;
 using LotteryApi.Repositories;
 
@@ -7,41 +8,88 @@ namespace LotteryApi.Services
     public class GiftService
     {
         private readonly GiftRepoditory _giftRepository = new();
+        //public async Task<IEnumerable<GiftDto>> GetGiftsAsync()
+        //{
+        //    var gifts = await _giftRepository.GetGiftsAsync();
+        //    return gifts.Select(g => new GiftDto
+        //    {
+        //        Id = g.Id,
+        //        Name = g.Name,
+        //       Description = g.Description,
+        //       CategoryId = g.CategoryId,
+        //       DonorId = g.DonorId,
+        //       CategoryName = g.Category!= null ? g.Category.Name : null,
+        //       DonorName = g.Donor != null ? g.Donor.Name : null,
+        //       PrizeQuantity = g.PrizeQuantity,
+        //       CardPrice = g.CardPrice.ToString(),
+        //       PictureUrl = g.PictureUrl,
+        //       GifPurchased=g.GifPurchased.Select(go=> new GiftInOrderModel
+        //       {
+        //           Id= go.Id,
+        //           GiftId= go.GiftId,
+        //           IsWinner= go.IsWinner
+        //       }).ToList()
+        //    });
+
+        //}
         public async Task<IEnumerable<GiftDto>> GetGiftsAsync()
         {
+            // שליפת הנתונים מה-Repository (כולל כל ה-Includes שסידרנו)
             var gifts = await _giftRepository.GetGiftsAsync();
+
             return gifts.Select(g => new GiftDto
             {
                 Id = g.Id,
                 Name = g.Name,
-               Description = g.Description,
-               CategoryId = g.CategoryId,
-               DonorId = g.DonorId,
-               CategoryName = g.Category!= null ? g.Category.Name : null,
-               DonorName = g.Donor != null ? g.Donor.Name : null,
-               PrizeQuantity = g.PrizeQuantity,
-               CardPrice = g.CardPrice.ToString(),
-               PictureUrl = g.PictureUrl
-
+                Description = g.Description,
+                CategoryId = g.CategoryId,
+                CategoryName = g.Category?.Name, // מגיע מ-CategoryModel
+                PrizeQuantity = g.PrizeQuantity,
+                CardPrice = g.CardPrice.ToString(),
+                PictureUrl = g.PictureUrl,
+                DonorId = g.DonorId,
+                DonorName = g.Donor?.Name, // מגיע מ-DonorModel
+                PurchasersCount = g.GifPurchased?.Count() ?? 0,
+        // מיפוי רשימת הרוכשים לתוך ה-DTO הייעודי
+        // שימי לב: אנחנו לא שולחים כאן שוב את שם המתנה כי הוא כבר למעלה (g.Name)
+        GifPurchased = g.GifPurchased?.Select(gp => new GiftPurchaserDto
+                {
+                    Id = gp.Id,
+                    IsWinner = gp.IsWinner,
+                    ParticipantName = gp.Order?.Participant?.Name,
+                    ParticipantPhone = gp.Order?.Participant?.Phone,
+                    ParticipantEmail = gp.Order?.Participant?.Email
+                }).ToList() ??[]
             });
-
         }
         public async Task<GiftDto?> GetGiftByIdAsync(int id)
         {
             var gift = await _giftRepository.GetGiftByIdAsync(id);
-            return gift != null ? new GiftDto 
-            { Id = gift.Id,
+            return gift != null ? new GiftDto
+            {
+                Id = gift.Id,
                 Name = gift.Name,
                 Description = gift.Description,
                 CategoryId = gift.CategoryId,
-                DonorId = gift.DonorId,
-                CategoryName = gift.Category != null ? gift.Category.Name : null,
-                DonorName = gift.Donor != null ? gift.Donor.Name : null,
+                CategoryName = gift.Category?.Name,
                 PrizeQuantity = gift.PrizeQuantity,
                 CardPrice = gift.CardPrice.ToString(),
-                PictureUrl = gift.PictureUrl
+                PictureUrl = gift.PictureUrl,
+                DonorId = gift.DonorId,
+                DonorName = gift.Donor?.Name, 
+                PurchasersCount = gift.GifPurchased?.Count() ?? 0,
+                
+                GifPurchased = gift.GifPurchased?.Select(gp => new GiftPurchaserDto
+                {
+                    Id = gp.Id,
+                    IsWinner = gp.IsWinner,
+                    ParticipantName = gp.Order?.Participant?.Name,
+                    ParticipantPhone = gp.Order?.Participant?.Phone,
+                    ParticipantEmail = gp.Order?.Participant?.Email
 
-            } : null;
+                }).ToList() ?? [] 
+            }: null;
+
         }
 
         public async Task<GiftDto> CreateGiftAsync(GiftCreateDto gift)
@@ -59,20 +107,31 @@ namespace LotteryApi.Services
 
             var createGift = await _giftRepository.CreateGiftAsync(newGift);
             var giftWithDetails =  await _giftRepository.GetGiftByIdAsync(createGift.Id);
-            return new GiftDto 
+            if (giftWithDetails == null) return null;
+            return  new GiftDto
             {
                 Id = giftWithDetails.Id,
                 Name = giftWithDetails.Name,
                 Description = giftWithDetails.Description,
                 CategoryId = giftWithDetails.CategoryId,
-                DonorId = giftWithDetails.DonorId,
-                CategoryName = giftWithDetails.Category != null ? giftWithDetails.Category.Name : null,
-                DonorName = giftWithDetails.Donor != null ? giftWithDetails.Donor.Name : null,
+                CategoryName = giftWithDetails.Category?.Name, // מגיע מ-CategoryModel
                 PrizeQuantity = giftWithDetails.PrizeQuantity,
                 CardPrice = giftWithDetails.CardPrice.ToString(),
-                PictureUrl = giftWithDetails.PictureUrl
+                PictureUrl = giftWithDetails.PictureUrl,
+                DonorId = giftWithDetails.DonorId,
+                DonorName = giftWithDetails.Donor?.Name, 
+                PurchasersCount = giftWithDetails.GifPurchased?.Count() ?? 0,
+                GifPurchased = giftWithDetails.GifPurchased?.Select(gp => new GiftPurchaserDto
+                {
+                    Id = gp.Id,
+                    IsWinner = gp.IsWinner,
+                    ParticipantName = gp.Order?.Participant?.Name,
+                    ParticipantPhone = gp.Order?.Participant?.Phone,
+                    ParticipantEmail = gp.Order?.Participant?.Email
+
+                }).ToList() ?? []
             };
-        }
+            }
 
         public async Task<GiftDto?> UpdateGiftAsync(int id, GiftUpdateDto updateGift)
         {
@@ -90,25 +149,116 @@ namespace LotteryApi.Services
             if (updateGift.PictureUrl != null) existing.PictureUrl = updateGift.PictureUrl;
             var newUpdateGift = await _giftRepository.UpdateGiftAsync(existing);
             var giftWithDetails = await _giftRepository.GetGiftByIdAsync(newUpdateGift.Id);
+            if (giftWithDetails == null) return null;
             return new GiftDto
             {
                 Id = giftWithDetails.Id,
                 Name = giftWithDetails.Name,
                 Description = giftWithDetails.Description,
                 CategoryId = giftWithDetails.CategoryId,
-                DonorId = giftWithDetails.DonorId,
-                CategoryName = giftWithDetails.Category != null ? giftWithDetails.Category.Name : null,
-                DonorName = giftWithDetails.Donor != null ? giftWithDetails.Donor.Name : null,
+                CategoryName = giftWithDetails.Category?.Name,
                 PrizeQuantity = giftWithDetails.PrizeQuantity,
                 CardPrice = giftWithDetails.CardPrice.ToString(),
-                PictureUrl = giftWithDetails.PictureUrl
-            };
+                PictureUrl = giftWithDetails.PictureUrl,
+                DonorId = giftWithDetails.DonorId,
+                DonorName = giftWithDetails.Donor?.Name,
+                PurchasersCount = giftWithDetails.GifPurchased?.Count() ?? 0,
+                GifPurchased = giftWithDetails.GifPurchased?.Select(gp => new GiftPurchaserDto
+                {
+                    Id = gp.Id,
+                    IsWinner = gp.IsWinner,
+                    ParticipantName = gp.Order?.Participant?.Name,
+                    ParticipantPhone = gp.Order?.Participant?.Phone,
+                    ParticipantEmail = gp.Order?.Participant?.Email
 
+                }).ToList() ?? []
+            };
         }
         public async Task<bool> DeleteGiftAsync(int id)
         {
             return await _giftRepository.DeleteGiftAsync(id);
         }
+        public async Task<IEnumerable<GiftDto>> SearchGiftsAsync(string? giftName, string? donorName, int? minPurchasers)
+        {
+            var gifts = await _giftRepository.SearchGiftsAsync(giftName, donorName, minPurchasers);
 
+            return gifts.Select(g => new GiftDto
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Description = g.Description,
+                CategoryName = g.Category?.Name,
+                DonorName = g.Donor?.Name,
+                PrizeQuantity = g.PrizeQuantity,
+                CardPrice = g.CardPrice.ToString(),
+                PictureUrl = g.PictureUrl,
+                PurchasersCount = g.GifPurchased?.Count ?? 0,
+
+                GifPurchased = g.GifPurchased?
+                    .Select(gp => new GiftPurchaserDto
+                    {
+                        Id = gp.Id,
+                        ParticipantName = gp.Order?.Participant?.Name,
+                        ParticipantEmail = gp.Order?.Participant?.Email,
+                        ParticipantPhone = gp.Order?.Participant?.Phone,
+                        IsWinner = gp.IsWinner,
+                    }).ToList() ?? new List<GiftPurchaserDto>()
+            });
+        }
+        public async Task<IEnumerable<GiftDto>> FilteredGiftsAsync(int? categoryId, CardPriceEnum? priceType)
+        {
+            var gifts = await _giftRepository.FilterGiftsAsync(categoryId, priceType);
+
+            return gifts.Select(g => new GiftDto
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Description = g.Description,
+                CategoryName = g.Category?.Name,
+                DonorName = g.Donor?.Name,
+                PrizeQuantity = g.PrizeQuantity,
+                CardPrice = g.CardPrice.ToString(),
+                PictureUrl = g.PictureUrl,
+                PurchasersCount = g.GifPurchased?.Count ?? 0,
+
+                GifPurchased = g.GifPurchased?
+                    .Select(gp => new GiftPurchaserDto
+                    {
+                        Id = gp.Id,
+                        ParticipantName = gp.Order?.Participant?.Name,
+                        ParticipantEmail = gp.Order?.Participant?.Email,
+                        ParticipantPhone = gp.Order?.Participant?.Phone,
+                        IsWinner = gp.IsWinner,
+                    }).ToList() ?? new List<GiftPurchaserDto>()
+            });
+        }
+        public async Task<IEnumerable<GiftDto>> SortedGiftsExpensiveAsync(string sortBy)
+        {
+            
+            var gifts = await _giftRepository.SortedGiftsExpensiveAsync(sortBy);
+
+            return gifts.Select(g => new GiftDto
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Description = g.Description,
+                CategoryName = g.Category?.Name,
+                DonorName = g.Donor?.Name,
+                PrizeQuantity = g.PrizeQuantity,
+                CardPrice = g.CardPrice.ToString(), 
+                PictureUrl = g.PictureUrl,
+                PurchasersCount = g.GifPurchased?.Count ?? 0,
+
+                GifPurchased = g.GifPurchased?
+                    .Select(gp => new GiftPurchaserDto
+                    {
+                        Id = gp.Id,
+                        ParticipantName = gp.Order?.Participant?.Name,
+                        ParticipantEmail = gp.Order?.Participant?.Email,
+                        ParticipantPhone = gp.Order?.Participant?.Phone,
+                        IsWinner = gp.IsWinner,
+                    }).ToList() ?? new List<GiftPurchaserDto>()
+            });
+        }
     }
 }

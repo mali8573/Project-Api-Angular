@@ -10,11 +10,15 @@ namespace LotteryApi.Repositories
         private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
         public async Task <IEnumerable<DonorModel>> GetDonorsAsync()
         {
-            return await _lotteryContext.Donors.ToListAsync();
+            return await _lotteryContext.Donors
+                .Include(d => d.Gifts)               
+                .ToListAsync();
         }
         public async Task<DonorModel?> GetDonorsByIdAsync(int id)
         {
-            return await _lotteryContext.Donors.FirstOrDefaultAsync(c => c.Id == id);
+            return await _lotteryContext.Donors
+                 .Include(d => d.Gifts)
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
         public async Task<DonorModel> CreateDonorsAsync(DonorModel donor)
         {
@@ -40,6 +44,25 @@ namespace LotteryApi.Repositories
             _lotteryContext.Donors.Remove(existing);
             await _lotteryContext.SaveChangesAsync();
             return true;
+        }
+        public async Task<IEnumerable<DonorModel>> GetFilteredDonorsAsync(string? name, string? email, string? giftName)
+        {
+            
+            var query = _lotteryContext.Donors.Include(d => d.Gifts).AsQueryable();
+
+            
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(d => d.Name.Contains(name));
+
+            if (!string.IsNullOrWhiteSpace(email))
+                query = query.Where(d => d.Email.Contains(email));
+
+            if (!string.IsNullOrWhiteSpace(giftName))
+               
+                query = query.Where(d => d.Gifts.Any(g => g.Name.Contains(giftName)));
+
+     
+            return await query.ToListAsync();
         }
     }
 

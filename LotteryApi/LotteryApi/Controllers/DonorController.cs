@@ -29,10 +29,10 @@ namespace LotteryApi.Controllers
             return Ok(donor);
         }
         [HttpPost]
-        public async Task<ActionResult<DonorDto>> CreateDonorsAsync([FromBody] DonorDto donor)
+        public async Task<ActionResult<DonorDto>> CreateDonorsAsync([FromBody] DonorCreateDto donor)
         {
-            await _donorService.CreateDonorsAsync(donor);
-                return Ok(donor);
+            var createDonor=await _donorService.CreateDonorsAsync(donor);
+                return Ok(createDonor);
         }
         [HttpPut("{id}")]
         public async Task<ActionResult<DonorDto>> UpdateDonorsAsync(int id, [FromBody] DonorUpdateDto updateDonor)
@@ -53,6 +53,15 @@ namespace LotteryApi.Controllers
                 return NotFound(new { message = $"Donor with ID {id} not found." });
             }
             return NoContent();
+        }
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<DonorDto>>> GetFilteredDonors(
+        [FromQuery] string? name,
+        [FromQuery] string? email,
+        [FromQuery] string? giftName)
+        {
+            var results = await _donorService.GetFilteredDonorsAsync(name, email, giftName);
+            return Ok(results);
         }
     }
 }

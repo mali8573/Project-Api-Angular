@@ -28,7 +28,7 @@ namespace LotteryApi.Repositories
                    .ThenInclude(g => g.Gift)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
-        public async Task<OrderModel> CreateGiftAsync(OrderModel order)
+        public async Task<OrderModel> CreateOrderAsync(OrderModel order)
         {
             _lotteryContext.Orders.Add(order);
             await _lotteryContext.SaveChangesAsync();

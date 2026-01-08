@@ -16,13 +16,13 @@ namespace LotteryApi.Repositories
                  .ThenInclude(g => g.Gift)
                .FirstOrDefaultAsync(p => p.Id == id);
         }
-        public async Task<bool> CreatePackagesAndGiftsInCartAsync(List<PackageInOrderModel>packages)
-        {
+        //public async Task<bool> CreatePackagesAndGiftsInCartAsync(List<PackageInOrderModel>packages)
+        //{
            
-            _lotteryContext.PackagesInOrder.AddRange(packages);
+        //    _lotteryContext.PackagesInOrder.AddRange(packages);
 
-            await _lotteryContext.SaveChangesAsync();
-            return true;
-        }
+        //    await _lotteryContext.SaveChangesAsync();
+        //    return true;
+        //}
     }
 }

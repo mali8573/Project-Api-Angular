@@ -1,10 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LotteryApi.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace LotteryApi.Dtos
 {
     public class DonorDto
     {
-        public string? Tz { get; set; } = string.Empty;
+        public int Id { get; set; }
+        
+        public string Name { get; set; } = string.Empty;
+
+        public string Phone { get; set; } = string.Empty;
+       
+        public string Email { get; set; } = string.Empty;
+        public List<string> GiftNames { get; set; } = new List<string>();
+    }
+    public class DonorCreateDto
+    {
+
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required, Phone]
@@ -15,8 +27,6 @@ namespace LotteryApi.Dtos
     public class DonorUpdateDto
     {
        
-        public string? Tz { get; set; }
-
         public string? Name { get; set; }
         [ Phone]
         public string? Phone { get; set; }
