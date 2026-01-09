@@ -21,6 +21,17 @@ namespace LotteryApi.Repositories
                   .ThenInclude(g => g.Gift)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
+        public async Task<ShoppingCartModel?> GetShoppingCartByUserIdAsync(int ParticipantId)
+        {
+            return await _lotteryContext.ShoppingCarts
+               .Include(p => p.Participant)
+               .Include(pa => pa.PackagesInShoppingCart)
+                     .ThenInclude(p => p.Package)
+               .Include(pa => pa.PackagesInShoppingCart)
+                .ThenInclude(g => g.GiftsInPackage)
+                  .ThenInclude(g => g.Gift)
+                .FirstOrDefaultAsync(c => c.ParticipantId == ParticipantId);
+        }
         public async Task<ShoppingCartModel> CreateShoppingCartAsync(ShoppingCartModel shoppingCart)
         {
             _lotteryContext.ShoppingCarts.Add(shoppingCart);

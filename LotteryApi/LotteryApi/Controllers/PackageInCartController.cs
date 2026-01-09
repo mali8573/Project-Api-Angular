@@ -1,5 +1,6 @@
 ﻿using LotteryApi.Dtos;
 using LotteryApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,12 +23,14 @@ namespace LotteryApi.Controllers
             }
             return Ok(packageInCart);
         }
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<PackageInCartDto>> CreatePackageInCartAsync([FromBody] PackageInCartCreateDto packageInCart)
         {
             var newPackageInCart = await _packageInCartService.CreatePackageInCartAsync(packageInCart);
             return Ok(newPackageInCart);
         }
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePackageInCartAsync(int id)
         {
