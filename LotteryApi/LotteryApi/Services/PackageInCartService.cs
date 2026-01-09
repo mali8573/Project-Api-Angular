@@ -39,7 +39,7 @@ namespace LotteryApi.Services
              var newPackageInCart = new PackageInCartModel()
             {
                 PackageId = packageInCart.PackageId,
-                //לשנות השרת צריך מעצמו לדעת
+               
                 CartId = 1
 
             };

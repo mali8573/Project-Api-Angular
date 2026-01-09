@@ -14,7 +14,7 @@ namespace LotteryApi.Dtos
         public string Address { get; set; }
        
         public UserRoleEnum Role { get; set; } = UserRoleEnum.Participant;
-        public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
+        public ICollection<OrderDto> Orders { get; set; } = new List<OrderDto>();
     }
     public class UserCreateDto
     {

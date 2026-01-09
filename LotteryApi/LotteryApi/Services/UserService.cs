@@ -130,7 +130,30 @@ namespace LotteryApi.Services
                 Phone = user.Phone,
                 Address = user.Address,
                 Role = user.Role,
-                Orders = user.Orders,
+                Orders = user.Orders?.Select(o => new OrderDto
+                {
+                    Id = o.Id,
+                    ParticipantId= o.ParticipantId,
+                    ParticipantName = user.Name,
+                    SumPrice = o.SumPrice,
+                    date= o.date,
+                    PackagesInOrder = o.PackagesInOrder?.Select(p => new PackageInOrderDto
+                    {
+                        PackageId = p.PackageId,
+                        PackageName = p.Package?.Name,
+                        PriceAtPurchase = p.PriceAtPurchase,
+
+                        GiftsInPackage = p.GiftsInPackage?.Select(g => new GiftInOrderDto
+                        {
+                            Id = g.Id,
+                            GiftId = g.GiftId,
+                            GiftName = g.Gift?.Name,
+                            GiftPictureUrl = g.Gift?.PictureUrl,
+                            GiftCardPrice = g.Gift?.CardPrice.ToString(),
+                            IsWinner = g.IsWinner
+                        }).ToList() ??[ ]
+                    }).ToList() ?? []
+                }).ToList() ?? []
             };
         }
 

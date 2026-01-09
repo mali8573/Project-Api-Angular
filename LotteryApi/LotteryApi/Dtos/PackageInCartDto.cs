@@ -20,8 +20,5 @@ namespace LotteryApi.Dtos
     {
         [Required]
         public int PackageId { get; set; }
-
-
-
     }
 }
