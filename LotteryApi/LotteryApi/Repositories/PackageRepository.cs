@@ -4,10 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class PackageRepository
+    public class PackageRepository : IPackageRepository
     {
 
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext;
+        public PackageRepository(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
         public async Task<IEnumerable<PackageModel>> GetPackageAsync()
         {
             return await _lotteryContext.Packages.ToListAsync();

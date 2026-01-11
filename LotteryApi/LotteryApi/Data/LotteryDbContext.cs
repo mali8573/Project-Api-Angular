@@ -5,8 +5,8 @@ namespace LotteryApi.Data
 {
     public class LotteryDbContext : DbContext
     {
-        public  LotteryDbContext(DbContextOptions<LotteryDbContext> options) :base(options){}
-        public DbSet <DonorModel> Donors { get; set; }
+        public LotteryDbContext(DbContextOptions<LotteryDbContext> options) : base(options) { }
+        public DbSet<DonorModel> Donors { get; set; }
         public DbSet<GiftModel> Gifts { get; set; }
         public DbSet<UserModel> Users { get; set; }
         public DbSet<PackageModel> Packages { get; set; }
@@ -21,20 +21,37 @@ namespace LotteryApi.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // פתרון לשגיאת ה-Cascade במתנות שבתוך חבילה בסל
+
+
+            modelBuilder.Entity<PackageInCartModel>()
+                .HasOne(p => p.ShoppingCart)
+                .WithMany(s => s.PackagesInShoppingCart)
+                .HasForeignKey(p => p.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
             modelBuilder.Entity<GiftInCartModel>()
                 .HasOne(g => g.PackageInCart)
                 .WithMany(p => p.GiftsInPackage)
                 .HasForeignKey(g => g.PackageInCartId)
-                .OnDelete(DeleteBehavior.Restrict); // מונע מחיקה כפולה בשרשרת
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // פתרון למניעת שגיאה דומה במתנות שבתוך חבילה בהזמנה
+
+            modelBuilder.Entity<GiftInCartModel>()
+                .HasOne(g => g.ShoppingCart)
+                .WithMany()
+                .HasForeignKey(g => g.CartId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+        
+           
             modelBuilder.Entity<GiftInOrderModel>()
                 .HasOne(g => g.PackageInOrder)
                 .WithMany(p => p.GiftsInPackage)
                 .HasForeignKey(g => g.PackageInOrderId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+                .OnDelete(DeleteBehavior.Cascade);
 
+        }
     }
+
 }

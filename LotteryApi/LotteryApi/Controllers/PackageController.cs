@@ -10,7 +10,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class PackageController : ControllerBase
     {
-        private readonly PackageService _packageService = new();
+        private readonly IPackageService _packageService ;
+        public PackageController(IPackageService packageService)
+        {
+            _packageService =  packageService;
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PackageDto>>> GetPackageAsync()

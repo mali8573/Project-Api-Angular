@@ -10,7 +10,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class GiftController : ControllerBase
     {
-        private readonly GiftService _giftService = new();
+        private readonly IGiftService _giftService ;
+        public GiftController(GiftService giftService)
+        {
+            _giftService =  giftService;
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GiftDto>>> GetGiftAsync()

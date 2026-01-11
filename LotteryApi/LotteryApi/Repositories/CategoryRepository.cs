@@ -4,13 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class CategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
 
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext;
+        public CategoryRepository(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
         public async Task<IEnumerable<CategoryModel>> GetCategoriesAsync()
         {
-            return await _lotteryContext.Categories.Include(c=>c.Gifts).ToListAsync();
+            return await _lotteryContext.Categories.Include(c => c.Gifts).ToListAsync();
         }
         public async Task<CategoryModel?> GetCategoryByIdAsync(int id)
         {
@@ -43,6 +47,6 @@ namespace LotteryApi.Repositories
             await _lotteryContext.SaveChangesAsync();
             return true;
         }
-       
+
     }
 }

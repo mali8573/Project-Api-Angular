@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LotteryApi.Migrations
 {
     /// <inheritdoc />
-    public partial class initalCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,7 +30,6 @@ namespace LotteryApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Tz = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -209,8 +208,7 @@ namespace LotteryApi.Migrations
                     GiftId = table.Column<int>(type: "int", nullable: false),
                     PackageInOrderId = table.Column<int>(type: "int", nullable: false),
                     OrderId = table.Column<int>(type: "int", nullable: false),
-                    PriceAtPurchase = table.Column<int>(type: "int", nullable: false),
-                    IsWinner = table.Column<bool>(type: "bit", nullable: true)
+                    IsWinner = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -226,13 +224,13 @@ namespace LotteryApi.Migrations
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_GiftsInOrder_PackagesInOrder_PackageInOrderId",
                         column: x => x.PackageInOrderId,
                         principalTable: "PackagesInOrder",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -244,7 +242,8 @@ namespace LotteryApi.Migrations
                     GiftId = table.Column<int>(type: "int", nullable: false),
                     PackageInCartId = table.Column<int>(type: "int", nullable: false),
                     CartId = table.Column<int>(type: "int", nullable: false),
-                    Qty = table.Column<int>(type: "int", nullable: false)
+                    Qty = table.Column<int>(type: "int", nullable: false),
+                    ShoppingCartModelId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -260,13 +259,18 @@ namespace LotteryApi.Migrations
                         column: x => x.PackageInCartId,
                         principalTable: "PackagesInCart",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GiftsInCart_ShoppingCarts_CartId",
                         column: x => x.CartId,
                         principalTable: "ShoppingCarts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GiftsInCart_ShoppingCarts_ShoppingCartModelId",
+                        column: x => x.ShoppingCartModelId,
+                        principalTable: "ShoppingCarts",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -293,6 +297,11 @@ namespace LotteryApi.Migrations
                 name: "IX_GiftsInCart_PackageInCartId",
                 table: "GiftsInCart",
                 column: "PackageInCartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GiftsInCart_ShoppingCartModelId",
+                table: "GiftsInCart",
+                column: "ShoppingCartModelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GiftsInOrder_GiftId",

@@ -5,9 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class ShoppingCartRepository
+    public class ShoppingCartRepository : IShoppingCartRepository
     {
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext;
+        public ShoppingCartRepository(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
 
 
         public async Task<ShoppingCartModel?> GetShoppingCartByIdAsync(int id)
@@ -58,7 +62,7 @@ namespace LotteryApi.Repositories
             return true;
 
         }
-  
+
 
         public async Task<bool> EmptyCartAsync(int cartId)
         {
@@ -76,4 +80,4 @@ namespace LotteryApi.Repositories
             return true;
         }
     }
-    }
+}

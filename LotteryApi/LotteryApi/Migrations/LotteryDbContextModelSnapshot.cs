@@ -84,6 +84,9 @@ namespace LotteryApi.Migrations
                     b.Property<int>("Qty")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ShoppingCartModelId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CartId");
@@ -91,6 +94,8 @@ namespace LotteryApi.Migrations
                     b.HasIndex("GiftId");
 
                     b.HasIndex("PackageInCartId");
+
+                    b.HasIndex("ShoppingCartModelId");
 
                     b.ToTable("GiftsInCart");
                 });
@@ -106,11 +111,8 @@ namespace LotteryApi.Migrations
                     b.Property<int>("GiftId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsWinner")
+                    b.Property<bool>("IsWinner")
                         .HasColumnType("bit");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
 
                     b.Property<int>("PackageInOrderId")
                         .HasColumnType("int");
@@ -118,8 +120,6 @@ namespace LotteryApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GiftId");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("PackageInOrderId");
 
@@ -327,9 +327,9 @@ namespace LotteryApi.Migrations
             modelBuilder.Entity("LotteryApi.Models.GiftInCartModel", b =>
                 {
                     b.HasOne("LotteryApi.Models.ShoppingCartModel", "ShoppingCart")
-                        .WithMany("GiftsInShoppingCart")
+                        .WithMany()
                         .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("LotteryApi.Models.GiftModel", "Gift")
@@ -341,8 +341,12 @@ namespace LotteryApi.Migrations
                     b.HasOne("LotteryApi.Models.PackageInCartModel", "PackageInCart")
                         .WithMany("GiftsInPackage")
                         .HasForeignKey("PackageInCartId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("LotteryApi.Models.ShoppingCartModel", null)
+                        .WithMany("GiftsInShoppingCart")
+                        .HasForeignKey("ShoppingCartModelId");
 
                     b.Navigation("Gift");
 
@@ -354,26 +358,18 @@ namespace LotteryApi.Migrations
             modelBuilder.Entity("LotteryApi.Models.GiftInOrderModel", b =>
                 {
                     b.HasOne("LotteryApi.Models.GiftModel", "Gift")
-                        .WithMany()
+                        .WithMany("GifPurchased")
                         .HasForeignKey("GiftId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LotteryApi.Models.OrderModel", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LotteryApi.Models.PackageInOrderModel", "PackageInOrder")
                         .WithMany("GiftsInPackage")
                         .HasForeignKey("PackageInOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Gift");
-
-                    b.Navigation("Order");
 
                     b.Navigation("PackageInOrder");
                 });
@@ -465,6 +461,11 @@ namespace LotteryApi.Migrations
             modelBuilder.Entity("LotteryApi.Models.DonorModel", b =>
                 {
                     b.Navigation("Gifts");
+                });
+
+            modelBuilder.Entity("LotteryApi.Models.GiftModel", b =>
+                {
+                    b.Navigation("GifPurchased");
                 });
 
             modelBuilder.Entity("LotteryApi.Models.OrderModel", b =>

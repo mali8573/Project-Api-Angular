@@ -4,16 +4,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class PackageInCartRepository
+    public class PackageInCartRepository : IPackageInCartRepository
     {
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext ;
+
+        public PackageInCartRepository(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
 
         public async Task<PackageInCartModel?> GetPackageInCartByIdAsync(int id)
         {
             return await _lotteryContext.PackagesInCart
                 .Include(p => p.Package)
                 .Include(p => p.GiftsInPackage)
-                 .ThenInclude(g=> g.Gift)
+                 .ThenInclude(g => g.Gift)
                .FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task<PackageInCartModel> CreatePackageInCartAsync(PackageInCartModel packageInCart)

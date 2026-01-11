@@ -9,7 +9,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class OrsersController : ControllerBase
     {
-        private readonly OrderService _orderService = new();
+        private readonly IOrderService _orderService;
+        public OrsersController(IOrderService orderService)
+        {
+            _orderService = orderService;
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrdersAsync()

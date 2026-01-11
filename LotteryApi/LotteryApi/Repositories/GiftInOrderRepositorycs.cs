@@ -4,9 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class GiftInOrderRepositorycs
+    public class GiftInOrderRepositorycs : IGiftInOrderRepositorycs
     {
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext;
+        public GiftInOrderRepositorycs(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
         public async Task<GiftInOrderModel?> GetGiftInOrderByIdAsync(int id)
         {
             return await _lotteryContext.GiftsInOrder

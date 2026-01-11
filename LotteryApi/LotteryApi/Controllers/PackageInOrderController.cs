@@ -9,7 +9,12 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class PackageInOrderController : ControllerBase
     {
-        private readonly PakageInOrderService _pakageInOrderService = new();
+        private readonly IPakageInOrderService _pakageInOrderService;
+        public PackageInOrderController(IPakageInOrderService pakageInOrderService)
+        {
+            _pakageInOrderService = pakageInOrderService;
+        }
+
 
 
         [HttpGet("{id}")]

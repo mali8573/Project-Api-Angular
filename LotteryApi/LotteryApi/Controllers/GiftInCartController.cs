@@ -9,7 +9,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class GiftInCartController : ControllerBase
     {
-        private readonly GiftInCartService _giftInCartService = new();
+        private readonly IGiftInCartService _giftInCartService ;
+        public GiftInCartController(IGiftInCartService giftInCartService)
+        {
+            _giftInCartService =  giftInCartService;
+        }
 
 
         [HttpGet("{id}")]
@@ -22,13 +26,13 @@ namespace LotteryApi.Controllers
             }
             return Ok(giftInCart);
         }
-        [HttpGet("{id,giftId}")]
-        public async Task<ActionResult<GiftInCartDto>> GetGiftInCartByIdAndByPackageAsync(int id, int giftId)
+        [HttpGet("package/{packageInCartId}/gift/{giftId}")]
+        public async Task<ActionResult<GiftInCartDto>> GetGiftInCartByIdAndByPackageAsync(int giftId, int packageInCartId)
         {
-            var giftInCart = await _giftInCartService.GetGiftInCartByIdAndByPackageAsync(id, giftId);
+            var giftInCart = await _giftInCartService.GetGiftInCartByIdAndByPackageAsync(giftId, packageInCartId);
             if (giftInCart == null)
             {
-                return NotFound(new { message = $"GiftInCart with Cart ID {id} and Gift ID {giftId} not found." });
+                return NotFound(new { message = $"The gift ID :{giftId} in package ID: {packageInCartId} not found." });
             }
             return Ok(giftInCart);
         }

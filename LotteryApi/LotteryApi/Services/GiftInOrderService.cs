@@ -4,9 +4,13 @@ using System.Runtime.CompilerServices;
 
 namespace LotteryApi.Services
 {
-    public class GiftInOrderService
+    public class GiftInOrderService : IGiftInOrderService
     {
-        private readonly GiftInOrderRepositorycs _giftInOrderRepositorycs = new();
+        private readonly IGiftInOrderRepositorycs _giftInOrderRepositorycs;
+        public GiftInOrderService(IGiftInOrderRepositorycs giftInOrderRepositorycs)
+        {
+            _giftInOrderRepositorycs = giftInOrderRepositorycs;
+        }
 
         public async Task<GiftInOrderDto?> GetGiftInOrderByIdAsync(int id)
         {
@@ -18,7 +22,7 @@ namespace LotteryApi.Services
                 GiftName = giftInOrder.Gift?.Name,
                 GiftPictureUrl = giftInOrder.Gift?.PictureUrl,
                 GiftCardPrice = giftInOrder.Gift?.CardPrice.ToString(),
-                IsWinner= giftInOrder.IsWinner
+                IsWinner = giftInOrder.IsWinner
             } : null;
 
         }

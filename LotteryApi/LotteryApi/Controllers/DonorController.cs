@@ -10,7 +10,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class DonorController : ControllerBase
     {
-        private readonly DonorService _donorService = new();
+        private readonly IDonorService _donorService ;
+        DonorController(DonorService donorService)
+        {
+            _donorService =  donorService;
+        }
 
         [HttpGet]
         public async Task <ActionResult<IEnumerable<DonorDto>>> GetDonorsAsync()

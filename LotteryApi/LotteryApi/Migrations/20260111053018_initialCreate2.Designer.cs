@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LotteryApi.Migrations
 {
     [DbContext(typeof(LotteryDbContext))]
-    [Migration("20251231182201_update3")]
-    partial class update3
+    [Migration("20260111053018_initialCreate2")]
+    partial class initialCreate2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,9 +62,6 @@ namespace LotteryApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tz")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Donors");
@@ -90,6 +87,9 @@ namespace LotteryApi.Migrations
                     b.Property<int>("Qty")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ShoppingCartModelId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CartId");
@@ -97,6 +97,8 @@ namespace LotteryApi.Migrations
                     b.HasIndex("GiftId");
 
                     b.HasIndex("PackageInCartId");
+
+                    b.HasIndex("ShoppingCartModelId");
 
                     b.ToTable("GiftsInCart");
                 });
@@ -112,11 +114,8 @@ namespace LotteryApi.Migrations
                     b.Property<int>("GiftId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsWinner")
+                    b.Property<bool>("IsWinner")
                         .HasColumnType("bit");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
 
                     b.Property<int>("PackageInOrderId")
                         .HasColumnType("int");
@@ -124,8 +123,6 @@ namespace LotteryApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GiftId");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("PackageInOrderId");
 
@@ -333,9 +330,9 @@ namespace LotteryApi.Migrations
             modelBuilder.Entity("LotteryApi.Models.GiftInCartModel", b =>
                 {
                     b.HasOne("LotteryApi.Models.ShoppingCartModel", "ShoppingCart")
-                        .WithMany("GiftsInShoppingCart")
+                        .WithMany()
                         .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("LotteryApi.Models.GiftModel", "Gift")
@@ -347,8 +344,12 @@ namespace LotteryApi.Migrations
                     b.HasOne("LotteryApi.Models.PackageInCartModel", "PackageInCart")
                         .WithMany("GiftsInPackage")
                         .HasForeignKey("PackageInCartId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("LotteryApi.Models.ShoppingCartModel", null)
+                        .WithMany("GiftsInShoppingCart")
+                        .HasForeignKey("ShoppingCartModelId");
 
                     b.Navigation("Gift");
 
@@ -360,26 +361,18 @@ namespace LotteryApi.Migrations
             modelBuilder.Entity("LotteryApi.Models.GiftInOrderModel", b =>
                 {
                     b.HasOne("LotteryApi.Models.GiftModel", "Gift")
-                        .WithMany()
+                        .WithMany("GifPurchased")
                         .HasForeignKey("GiftId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LotteryApi.Models.OrderModel", "Order")
-                        .WithMany("GiftsInOrder")
-                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LotteryApi.Models.PackageInOrderModel", "PackageInOrder")
                         .WithMany("GiftsInPackage")
                         .HasForeignKey("PackageInOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Gift");
-
-                    b.Navigation("Order");
 
                     b.Navigation("PackageInOrder");
                 });
@@ -406,7 +399,7 @@ namespace LotteryApi.Migrations
             modelBuilder.Entity("LotteryApi.Models.OrderModel", b =>
                 {
                     b.HasOne("LotteryApi.Models.UserModel", "Participant")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -473,10 +466,13 @@ namespace LotteryApi.Migrations
                     b.Navigation("Gifts");
                 });
 
+            modelBuilder.Entity("LotteryApi.Models.GiftModel", b =>
+                {
+                    b.Navigation("GifPurchased");
+                });
+
             modelBuilder.Entity("LotteryApi.Models.OrderModel", b =>
                 {
-                    b.Navigation("GiftsInOrder");
-
                     b.Navigation("PackagesInOrder");
                 });
 
@@ -495,6 +491,11 @@ namespace LotteryApi.Migrations
                     b.Navigation("GiftsInShoppingCart");
 
                     b.Navigation("PackagesInShoppingCart");
+                });
+
+            modelBuilder.Entity("LotteryApi.Models.UserModel", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,16 +4,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class OrderRepository
+    public class OrderRepository : IOrderRepository
     {
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext;
+        public OrderRepository(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
 
         public async Task<IEnumerable<OrderModel>> GetOrdersAsync()
         {
             return await _lotteryContext.Orders
                 .Include(p => p.PackagesInOrder)
                   .ThenInclude(p => p.Package)
-                .Include(p=> p.PackagesInOrder)
+                .Include(p => p.PackagesInOrder)
                  .ThenInclude(g => g.GiftsInPackage)
                    .ThenInclude(g => g.Gift)
                 .ToListAsync();

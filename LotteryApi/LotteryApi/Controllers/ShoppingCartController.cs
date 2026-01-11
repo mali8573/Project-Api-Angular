@@ -9,7 +9,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class ShoppingCartController : ControllerBase
     {
-        private readonly ShoppingCartService _shoppingCartService = new();
+        private readonly IShoppingCartService _shoppingCartService ;
+        public ShoppingCartController(IShoppingCartService shoppingCartService)
+        {
+            _shoppingCartService = shoppingCartService;
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ShoppingCartDto>> GetShoppingCartByIdAsync(int id)
@@ -18,6 +22,16 @@ namespace LotteryApi.Controllers
             if (shoppingCart == null)
             {
                 return NotFound(new { message = $"ShoppingCart with ID {id} not found." });
+            }
+            return Ok(shoppingCart);
+        }
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult<ShoppingCartDto>> GetShoppingCartByUserIdAsync(int id)
+        {
+            var shoppingCart = await _shoppingCartService.GetShoppingCartByUserIdAsync(id);
+            if (shoppingCart == null)
+            {
+                return NotFound(new { message = $"ShoppingCart with UserID {id} not found." });
             }
             return Ok(shoppingCart);
         }

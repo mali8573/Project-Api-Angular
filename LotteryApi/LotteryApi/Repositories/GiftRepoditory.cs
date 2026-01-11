@@ -5,17 +5,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class GiftRepoditory
+    public class GiftRepoditory : IGiftRepoditory
     {
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext;
+        public GiftRepoditory(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
         public async Task<IEnumerable<GiftModel>> GetGiftsAsync()
         {
             return await _lotteryContext.Gifts
                 .Include(c => c.Category)
-                .Include(d=>d.Donor)
-                .Include(g=>g.GifPurchased)
-                  .ThenInclude(o=>o.Order)
-                    .ThenInclude(u=>u.Participant)
+                .Include(d => d.Donor)
+                .Include(g => g.GifPurchased)
+                .ThenInclude(p=>p.PackageInOrder)
+                  .ThenInclude(o => o.Order)
+                    .ThenInclude(u => u.Participant)
                 .ToListAsync();
         }
         public async Task<GiftModel?> GetGiftByIdAsync(int id)
@@ -24,6 +29,7 @@ namespace LotteryApi.Repositories
                 .Include(c => c.Category)
                 .Include(d => d.Donor)
                  .Include(g => g.GifPurchased)
+                 .ThenInclude(p => p.PackageInOrder)
                   .ThenInclude(o => o.Order)
                     .ThenInclude(u => u.Participant)
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -59,6 +65,7 @@ namespace LotteryApi.Repositories
                 .Include(c => c.Category)
                 .Include(d => d.Donor)
                 .Include(g => g.GifPurchased)
+                .ThenInclude(gp => gp.PackageInOrder)
                     .ThenInclude(go => go.Order)
                 .AsQueryable();
 
@@ -84,7 +91,8 @@ namespace LotteryApi.Repositories
             var query = _lotteryContext.Gifts
                 .Include(g => g.Category)
                 .Include(g => g.Donor)
-                .Include(g => g.GifPurchased) 
+                .Include(g => g.GifPurchased)
+                .ThenInclude(gp => gp.PackageInOrder)
                     .ThenInclude(gp => gp.Order)
                     .ThenInclude(o => o.Participant)
                 .AsQueryable();
@@ -103,6 +111,7 @@ namespace LotteryApi.Repositories
                 .Include(g => g.Category)
                 .Include(g => g.Donor)
                 .Include(g => g.GifPurchased)
+                 .ThenInclude(gp => gp.PackageInOrder)
                     .ThenInclude(gp => gp.Order)
                     .ThenInclude(o => o.Participant)
                 .AsQueryable();

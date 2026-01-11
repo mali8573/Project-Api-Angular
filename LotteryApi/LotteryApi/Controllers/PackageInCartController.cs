@@ -10,8 +10,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class PackageInCartController : ControllerBase
     {
-        private readonly PackageInCartService _packageInCartService = new();
-
+        private readonly IPackageInCartService _packageInCartService ;
+        public PackageInCartController(IPackageInCartService packageInCartService)
+        {
+            _packageInCartService =  packageInCartService;
+        }
      
         [HttpGet("{id}")]
         public async Task<ActionResult<PackageInCartDto>> GetPackageInCartByIdAsync(int id)

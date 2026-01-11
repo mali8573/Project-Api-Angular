@@ -24,7 +24,7 @@ namespace LotteryApi.Dtos
     }
     public class GiftInCartUpdateDto
     {
-        [Required]
+      
         public int Qty { get; set; }
     }
 }

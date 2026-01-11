@@ -9,7 +9,11 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class GiftInOrderController : ControllerBase
     {
-        private readonly GiftInOrderService _giftInOrderService = new();
+        private readonly IGiftInOrderService _giftInOrderService;
+        public GiftInOrderController(IGiftInOrderService giftInOrderService)
+        {
+            _giftInOrderService = giftInOrderService;
+        }
 
 
         [HttpGet("{id}")]

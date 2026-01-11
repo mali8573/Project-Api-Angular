@@ -4,9 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class PackageInOrderRepository
+    public class PackageInOrderRepository : IPackageInOrderRepository
     {
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext;
+        public PackageInOrderRepository(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
 
         public async Task<PackageInOrderModel?> GetPackageInOrderByIdAsync(int id)
         {
@@ -18,7 +22,7 @@ namespace LotteryApi.Repositories
         }
         //public async Task<bool> CreatePackagesAndGiftsInCartAsync(List<PackageInOrderModel>packages)
         //{
-           
+
         //    _lotteryContext.PackagesInOrder.AddRange(packages);
 
         //    await _lotteryContext.SaveChangesAsync();

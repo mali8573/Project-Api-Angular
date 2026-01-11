@@ -80,7 +80,43 @@ builder.Services.AddAuthorization();
  builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
- 
+builder.Services.AddScoped<IPackageInCartRepository, PackageInCartRepository>();
+builder.Services.AddScoped<IPackageInCartService, PackageInCartService>();
+builder.Services.AddScoped<IPackageRepository, PackageRepository>();
+builder.Services.AddScoped<IPackageService, PackageService>();
+builder.Services.AddScoped<IPackageInOrderRepository, PackageInOrderRepository>();
+builder.Services.AddScoped<IPakageInOrderService, PakageInOrderService>();
+builder.Services.AddScoped<IGiftRepoditory, GiftRepoditory>();
+builder.Services.AddScoped<IPakageInOrderService, PakageInOrderService>();
+builder.Services.AddScoped<IGiftService, GiftService>();
+builder.Services.AddScoped<IGiftInCartRepository, GiftInCartRepository>();
+builder.Services.AddScoped<IGiftInCartService, GiftInCartService>();
+builder.Services.AddScoped<IGiftInOrderRepositorycs, GiftInOrderRepositorycs>();
+builder.Services.AddScoped<IGiftInOrderService, GiftInOrderService>();
+builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+builder.Services.AddScoped<IDonorService, DonorService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+
+
+
+
+
+
+
+
+
+
+
+
+builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

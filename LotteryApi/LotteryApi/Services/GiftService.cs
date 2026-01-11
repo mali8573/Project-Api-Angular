@@ -5,9 +5,13 @@ using LotteryApi.Repositories;
 
 namespace LotteryApi.Services
 {
-    public class GiftService
+    public class GiftService : IGiftService
     {
-        private readonly GiftRepoditory _giftRepository = new();
+        private readonly IGiftRepoditory _giftRepository;
+        public GiftService(IGiftRepoditory giftRepository)
+        {
+            _giftRepository = giftRepository;
+        }
         //public async Task<IEnumerable<GiftDto>> GetGiftsAsync()
         //{
         //    var gifts = await _giftRepository.GetGiftsAsync();
@@ -50,16 +54,16 @@ namespace LotteryApi.Services
                 DonorId = g.DonorId,
                 DonorName = g.Donor?.Name, // מגיע מ-DonorModel
                 PurchasersCount = g.GifPurchased?.Count() ?? 0,
-        // מיפוי רשימת הרוכשים לתוך ה-DTO הייעודי
-        // שימי לב: אנחנו לא שולחים כאן שוב את שם המתנה כי הוא כבר למעלה (g.Name)
-        GifPurchased = g.GifPurchased?.Select(gp => new GiftPurchaserDto
+                // מיפוי רשימת הרוכשים לתוך ה-DTO הייעודי
+                // שימי לב: אנחנו לא שולחים כאן שוב את שם המתנה כי הוא כבר למעלה (g.Name)
+                GifPurchased = g.GifPurchased?.Select(gp => new GiftPurchaserDto
                 {
                     Id = gp.Id,
                     IsWinner = gp.IsWinner,
-                    ParticipantName = gp.Order?.Participant?.Name,
-                    ParticipantPhone = gp.Order?.Participant?.Phone,
-                    ParticipantEmail = gp.Order?.Participant?.Email
-                }).ToList() ??[]
+                    ParticipantName = gp.PackageInOrder?.Order?.Participant?.Name,
+                    ParticipantPhone = gp.PackageInOrder?.Order.Participant?.Phone,
+                    ParticipantEmail = gp.PackageInOrder?.Order.Participant?.Email
+                }).ToList() ?? []
             });
         }
         public async Task<GiftDto?> GetGiftByIdAsync(int id)
@@ -76,19 +80,19 @@ namespace LotteryApi.Services
                 CardPrice = gift.CardPrice.ToString(),
                 PictureUrl = gift.PictureUrl,
                 DonorId = gift.DonorId,
-                DonorName = gift.Donor?.Name, 
+                DonorName = gift.Donor?.Name,
                 PurchasersCount = gift.GifPurchased?.Count() ?? 0,
-                
+
                 GifPurchased = gift.GifPurchased?.Select(gp => new GiftPurchaserDto
                 {
                     Id = gp.Id,
                     IsWinner = gp.IsWinner,
-                    ParticipantName = gp.Order?.Participant?.Name,
-                    ParticipantPhone = gp.Order?.Participant?.Phone,
-                    ParticipantEmail = gp.Order?.Participant?.Email
+                    ParticipantName = gp.PackageInOrder?.Order?.Participant?.Name,
+                    ParticipantPhone = gp.PackageInOrder?.Order.Participant?.Phone,
+                    ParticipantEmail = gp.PackageInOrder?.Order.Participant?.Email
 
-                }).ToList() ?? [] 
-            }: null;
+                }).ToList() ?? []
+            } : null;
 
         }
 
@@ -106,9 +110,9 @@ namespace LotteryApi.Services
             };
 
             var createGift = await _giftRepository.CreateGiftAsync(newGift);
-            var giftWithDetails =  await _giftRepository.GetGiftByIdAsync(createGift.Id);
+            var giftWithDetails = await _giftRepository.GetGiftByIdAsync(createGift.Id);
             if (giftWithDetails == null) return null;
-            return  new GiftDto
+            return new GiftDto
             {
                 Id = giftWithDetails.Id,
                 Name = giftWithDetails.Name,
@@ -119,19 +123,19 @@ namespace LotteryApi.Services
                 CardPrice = giftWithDetails.CardPrice.ToString(),
                 PictureUrl = giftWithDetails.PictureUrl,
                 DonorId = giftWithDetails.DonorId,
-                DonorName = giftWithDetails.Donor?.Name, 
+                DonorName = giftWithDetails.Donor?.Name,
                 PurchasersCount = giftWithDetails.GifPurchased?.Count() ?? 0,
                 GifPurchased = giftWithDetails.GifPurchased?.Select(gp => new GiftPurchaserDto
                 {
                     Id = gp.Id,
                     IsWinner = gp.IsWinner,
-                    ParticipantName = gp.Order?.Participant?.Name,
-                    ParticipantPhone = gp.Order?.Participant?.Phone,
-                    ParticipantEmail = gp.Order?.Participant?.Email
+                    ParticipantName = gp.PackageInOrder?.Order?.Participant?.Name,
+                    ParticipantPhone = gp.PackageInOrder?.Order.Participant?.Phone,
+                    ParticipantEmail = gp.PackageInOrder?.Order.Participant?.Email
 
                 }).ToList() ?? []
             };
-            }
+        }
 
         public async Task<GiftDto?> UpdateGiftAsync(int id, GiftUpdateDto updateGift)
         {
@@ -167,9 +171,9 @@ namespace LotteryApi.Services
                 {
                     Id = gp.Id,
                     IsWinner = gp.IsWinner,
-                    ParticipantName = gp.Order?.Participant?.Name,
-                    ParticipantPhone = gp.Order?.Participant?.Phone,
-                    ParticipantEmail = gp.Order?.Participant?.Email
+                    ParticipantName = gp.PackageInOrder?.Order?.Participant?.Name,
+                    ParticipantPhone = gp.PackageInOrder?.Order.Participant?.Phone,
+                    ParticipantEmail = gp.PackageInOrder?.Order.Participant?.Email
 
                 }).ToList() ?? []
             };
@@ -198,9 +202,9 @@ namespace LotteryApi.Services
                     .Select(gp => new GiftPurchaserDto
                     {
                         Id = gp.Id,
-                        ParticipantName = gp.Order?.Participant?.Name,
-                        ParticipantEmail = gp.Order?.Participant?.Email,
-                        ParticipantPhone = gp.Order?.Participant?.Phone,
+                        ParticipantName = gp.PackageInOrder?.Order?.Participant?.Name,
+                        ParticipantPhone = gp.PackageInOrder?.Order.Participant?.Phone,
+                        ParticipantEmail = gp.PackageInOrder?.Order.Participant?.Email,
                         IsWinner = gp.IsWinner,
                     }).ToList() ?? new List<GiftPurchaserDto>()
             });
@@ -225,16 +229,16 @@ namespace LotteryApi.Services
                     .Select(gp => new GiftPurchaserDto
                     {
                         Id = gp.Id,
-                        ParticipantName = gp.Order?.Participant?.Name,
-                        ParticipantEmail = gp.Order?.Participant?.Email,
-                        ParticipantPhone = gp.Order?.Participant?.Phone,
+                        ParticipantName = gp.PackageInOrder?.Order?.Participant?.Name,
+                        ParticipantPhone = gp.PackageInOrder?.Order.Participant?.Phone,
+                        ParticipantEmail = gp.PackageInOrder?.Order.Participant?.Email,
                         IsWinner = gp.IsWinner,
                     }).ToList() ?? new List<GiftPurchaserDto>()
             });
         }
         public async Task<IEnumerable<GiftDto>> SortedGiftsExpensiveAsync(string sortBy)
         {
-            
+
             var gifts = await _giftRepository.SortedGiftsExpensiveAsync(sortBy);
 
             return gifts.Select(g => new GiftDto
@@ -245,7 +249,7 @@ namespace LotteryApi.Services
                 CategoryName = g.Category?.Name,
                 DonorName = g.Donor?.Name,
                 PrizeQuantity = g.PrizeQuantity,
-                CardPrice = g.CardPrice.ToString(), 
+                CardPrice = g.CardPrice.ToString(),
                 PictureUrl = g.PictureUrl,
                 PurchasersCount = g.GifPurchased?.Count ?? 0,
 
@@ -253,9 +257,9 @@ namespace LotteryApi.Services
                     .Select(gp => new GiftPurchaserDto
                     {
                         Id = gp.Id,
-                        ParticipantName = gp.Order?.Participant?.Name,
-                        ParticipantEmail = gp.Order?.Participant?.Email,
-                        ParticipantPhone = gp.Order?.Participant?.Phone,
+                        ParticipantName = gp.PackageInOrder?.Order?.Participant?.Name,
+                        ParticipantPhone = gp.PackageInOrder?.Order.Participant?.Phone,
+                        ParticipantEmail = gp.PackageInOrder?.Order.Participant?.Email,
                         IsWinner = gp.IsWinner,
                     }).ToList() ?? new List<GiftPurchaserDto>()
             });

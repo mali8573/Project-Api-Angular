@@ -5,11 +5,19 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace LotteryApi.Services
 {
-    public class PakageInOrderService
+    public class PakageInOrderService : IPakageInOrderService
     {
-        private readonly PackageInOrderRepository _packageInOrderRepository = new();
-        private readonly PackageRepository _packageRepository = new();
-        private readonly ShoppingCartRepository _ShoppingCartRepository = new();
+        private readonly IPackageInOrderRepository _packageInOrderRepository;
+        private readonly IPackageRepository _packageRepository;
+        private readonly IShoppingCartRepository _ShoppingCartRepository;
+        public PakageInOrderService(IPackageInOrderRepository packageInOrderRepository,
+            IPackageRepository packageRepository,
+            IShoppingCartRepository shoppingCartRepository)
+        {
+            _packageInOrderRepository = packageInOrderRepository;
+            _packageRepository = packageRepository;
+            _ShoppingCartRepository = shoppingCartRepository;
+        }
 
         public async Task<PackageInOrderDto?> GetPackageInOrderByIdAsync(int id)
         {

@@ -5,15 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LotteryApi.Repositories
 {
-    public class GiftInCartRepository
+    public class GiftInCartRepository : IGiftInCartRepository
     {
-        private readonly LotteryDbContext _lotteryContext = LotteryDBFactory.CreateContext();
+        private readonly LotteryDbContext _lotteryContext ;
+        public GiftInCartRepository(LotteryDbContext lotteryDbContext)
+        {
+            _lotteryContext = lotteryDbContext;
+        }
 
         public async Task<GiftInCartModel?> GetGiftInCartByIdAsync(int id)
         {
             return await _lotteryContext.GiftsInCart
-              .Include(g=>g.Gift)
-              .Include(g=>g.PackageInCart)
+              .Include(g => g.Gift)
+              .Include(g => g.PackageInCart)
               .FirstOrDefaultAsync(g => g.Id == id);
         }
         public async Task<GiftInCartModel?> GetGiftInCartByIdAndByPackageAsync(int giftid, int packageInCartId)
@@ -29,14 +33,14 @@ namespace LotteryApi.Repositories
             await _lotteryContext.SaveChangesAsync();
             return giftInCart;
         }
-        
-        
+
+
         public async Task<GiftInCartModel?> UpdateGiftAsync(GiftInCartModel giftInCart)
         {
             var existing = await _lotteryContext.GiftsInCart.FindAsync(giftInCart.Id);
             if (existing == null)
                 return null;
-          existing.Qty = giftInCart.Qty;
+            existing.Qty = giftInCart.Qty;
             await _lotteryContext.SaveChangesAsync();
             return existing;
 
