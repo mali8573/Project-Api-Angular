@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LotteryApi.Models
 {
-    public class UserModel
+    public class UserModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        [Required]
+        [Required,MinLength(6),MaxLength(20)]
         public string Password { get; set; }
         [Required,EmailAddress]
         public string Email { get; set; }
@@ -18,6 +18,7 @@ namespace LotteryApi.Models
         public string Address { get; set; }
         [Required]
         public UserRoleEnum Role { get; set; } = UserRoleEnum.Participant;
+        public int OrganizationId { get; set; }
         public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
     }
 }

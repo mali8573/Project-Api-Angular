@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LotteryApi.Models
 {
-    public class OrderModel
+    public class OrderModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
@@ -16,6 +16,7 @@ namespace LotteryApi.Models
         public int SumPrice { get; set; }
         [Required]
         public DateOnly date {  get; set; }
+        public int OrganizationId { get; set; }
     }
 }
                                                                                             

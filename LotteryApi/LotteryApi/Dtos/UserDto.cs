@@ -21,7 +21,7 @@ namespace LotteryApi.Dtos
 
         [Required]
         public string Name { get; set; }
-        [Required]
+        [Required, MinLength(6), MaxLength(20)]
         public string Password { get; set; }
         [Required, EmailAddress]
         public string Email { get; set; }
@@ -34,15 +34,15 @@ namespace LotteryApi.Dtos
     public class UserUpdateDto
     {
 
-        [Required]
+     
         public string? Name { get; set; }
-        [Required]
+        [ MinLength(6), MaxLength(20)]
         public string? Password { get; set; }
-        [Required, EmailAddress]
+        [EmailAddress]
         public string? Email { get; set; }
-        [Required, Phone]
+        [Phone]
         public string? Phone { get; set; }
-        [Required]
+      
         public string? Address { get; set; }
        
     }

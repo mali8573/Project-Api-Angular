@@ -1,6 +1,7 @@
 ﻿using LotteryApi.Dtos;
 using LotteryApi.Models;
 using LotteryApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +16,14 @@ namespace LotteryApi.Controllers
         {
             _packageService =  packageService;
         }
-
+       
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PackageDto>>> GetPackageAsync()
         {
             var packages = await _packageService.GetPackageAsync();
             return Ok(packages);
         }
+       
         [HttpGet("{id}")]
         public async Task<ActionResult<PackageDto>> GetPackageByIdAsync(int id)
         {
@@ -32,12 +34,14 @@ namespace LotteryApi.Controllers
             }
             return Ok(package);
         }
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<ActionResult<PackageDto>> CreatePackageAsync([FromBody] PackageCreateDto package)
         {
             var newPackage = await _packageService.CreatePackageAsync(package);
             return Ok(newPackage);
         }
+        [Authorize(Roles = "Manager")]
         [HttpPut("{id}")]
         public async Task<ActionResult<PackageDto>> UpdatePackageAsync(int id, [FromBody] PackageUpdateDto package)
         {
@@ -48,6 +52,7 @@ namespace LotteryApi.Controllers
             }
             return Ok(updatePackage);
         }
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePackageAsync(int id)
         {

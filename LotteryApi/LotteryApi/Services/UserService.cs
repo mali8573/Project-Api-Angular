@@ -1,4 +1,5 @@
 ﻿using LotteryApi.Dtos;
+using LotteryApi.Exceptions;
 using LotteryApi.Models;
 using LotteryApi.Repositories;
 using static LotteryApi.Dtos.AuthDto;
@@ -41,7 +42,7 @@ namespace LotteryApi.Services
         {
             if (await _userRepository.EmailExistsUserAsync(usercreateDto.Email))
             {
-                throw new ArgumentException($"Email {usercreateDto.Email} is already registered.");
+                throw new ConflictException($"כתובת האימייל {usercreateDto.Email} כבר רשומה במערכת.");
             }
 
             var user = new UserModel
@@ -55,7 +56,10 @@ namespace LotteryApi.Services
             };
 
             var createdUser = await _userRepository.CreateUserAsync(user);
-            //_logger.LogInformation("User created with ID: {UserId}", createdUser.Id);
+            if (createdUser == null)
+            {
+                throw new Exception("חלה שגיאה ביצירת המשתמש בבסיס הנתונים.");
+            }
 
             return createdUser != null ? MapToResponseDto(createdUser) : null;
         }
@@ -90,23 +94,23 @@ namespace LotteryApi.Services
 
         public async Task<LoginResponseDto?> AuthenticateAsync(string email, string password)
         {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                throw new BadRequestException("חובה למלא את כל השדות.");
+            }
             var user = await _userRepository.GetUserByEmailAsync(email);
 
-            if (user == null)
-            {
-                // _logger.LogWarning("Login attempt failed: User not found for email {Email}", email);
-                return null;
-            }
+          
 
 
             var hashedPassword = HashPassword(password);
-            if (user.Password != hashedPassword)
+            if (user == null || user.Password != HashPassword(password))
             {
-                // _logger.LogWarning("Login attempt failed: Invalid password for email {Email}", email);
-                return null;
+                // זריקת השגיאה תפעיל אוטומטית את ה-Middleware
+                throw new UnauthorizedException("שם משתמש או סיסמה שגויים");
             }
 
-            var token = _tokenService.GenerateToken(user.Id, user.Email, user.Name, user.Role);
+            var token = _tokenService.GenerateToken(user.Id, user.Email, user.Name, user.Role, user.OrganizationId);
             var expiryMinutes = _configuration.GetValue<int>("JwtSettings:ExpiryMinutes", 60);
 
             //_logger.LogInformation("User {UserId} authenticated successfully", user.Id);

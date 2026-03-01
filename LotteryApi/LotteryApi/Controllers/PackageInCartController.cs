@@ -8,6 +8,7 @@ namespace LotteryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PackageInCartController : ControllerBase
     {
         private readonly IPackageInCartService _packageInCartService ;

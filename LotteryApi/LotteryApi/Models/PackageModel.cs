@@ -2,7 +2,7 @@
 
 namespace LotteryApi.Models
 {
-    public class PackageModel
+    public class PackageModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
@@ -15,6 +15,7 @@ namespace LotteryApi.Models
         public int QtySpecialCards { get; set; }
         [Required]
         public int QtyPrimumCards { get; set; }
-       
+        public int OrganizationId { get; set; }
+
     }
 }

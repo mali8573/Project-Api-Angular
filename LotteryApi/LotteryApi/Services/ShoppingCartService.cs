@@ -1,4 +1,5 @@
 ﻿using LotteryApi.Dtos;
+using LotteryApi.Exceptions;
 using LotteryApi.Models;
 using LotteryApi.Repositories;
 
@@ -73,6 +74,10 @@ namespace LotteryApi.Services
         }
         public async Task<ShoppingCartDto> CreateShoppingCartAsync(ShoppingCartCreateDto shoppingcart)
         {
+            if (shoppingcart == null || shoppingcart.ParticipantId == 0)
+            {
+                throw new BadRequestException("נתוני סל הקניות אינם תקינים.");
+            }
             var newShoppingCart = new ShoppingCartModel()
             {
 
@@ -81,9 +86,15 @@ namespace LotteryApi.Services
             };
 
             var createShoppingCart = await _shoppingCartRepository.CreateShoppingCartAsync(newShoppingCart);
+            if (createShoppingCart == null)
+            {
+                throw new ConflictException("לא ניתן היה ליצור את סל הקניות..");
+            }
             var createShoppingCartWithDetail = await _shoppingCartRepository.GetShoppingCartByIdAsync(createShoppingCart.Id);
             if (createShoppingCartWithDetail == null)
-                return null;
+            {
+                throw new NotFoundException("הסל נוצר אך לא נמצא במערכת.");
+            }
             return createShoppingCart != null ? new ShoppingCartDto
             {
                 Id = createShoppingCartWithDetail.Id,

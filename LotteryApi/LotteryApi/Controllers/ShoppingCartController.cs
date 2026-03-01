@@ -2,11 +2,12 @@
 using LotteryApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Authorization;
 namespace LotteryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ShoppingCartController : ControllerBase
     {
         private readonly IShoppingCartService _shoppingCartService ;
@@ -14,7 +15,7 @@ namespace LotteryApi.Controllers
         {
             _shoppingCartService = shoppingCartService;
         }
-
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<ShoppingCartDto>> GetShoppingCartByIdAsync(int id)
         {

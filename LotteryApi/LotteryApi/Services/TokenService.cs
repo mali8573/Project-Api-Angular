@@ -8,22 +8,20 @@ namespace LotteryApi.Services
 {
     public interface ITokenService
     {
-        string GenerateToken(int userId, string email, string name, UserRoleEnum role);
+        // הוספנו את organizationId כפרמטר
+        string GenerateToken(int userId, string email, string name, UserRoleEnum role, int organizationId);
     }
-
 
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _configuration;
-        // private readonly ILogger<TokenService> _logger;
 
-        public TokenService(IConfiguration configuration, ILogger<TokenService> logger)
+        public TokenService(IConfiguration configuration)
         {
             _configuration = configuration;
-            //_logger = logger;
         }
 
-        public string GenerateToken(int userId, string email, string name, UserRoleEnum role)
+        public string GenerateToken(int userId, string email, string name, UserRoleEnum role, int organizationId)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
@@ -36,13 +34,16 @@ namespace LotteryApi.Services
 
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(JwtRegisteredClaimNames.Name, name),
-            new Claim(ClaimTypes.Role, role.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-        };
+                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(JwtRegisteredClaimNames.Name, name),
+                new Claim(ClaimTypes.Role, role.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                
+                // השורה החדשה והחשובה:
+                new Claim("OrganizationId", organizationId.ToString())
+            };
 
             var token = new JwtSecurityToken(
                 issuer: issuer,
@@ -52,11 +53,7 @@ namespace LotteryApi.Services
                 signingCredentials: credentials
             );
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            // _logger.LogInformation("Generated JWT token for user {UserId}", userId);
-
-            return tokenString;
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LotteryApi.Models
 {
-    public class PackageInOrderModel
+    public class PackageInOrderModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
@@ -15,7 +15,8 @@ namespace LotteryApi.Models
         [ForeignKey("OrderId")]
         public OrderModel Order { get; set; }
         [Required]
-        public int PriceAtPurchase { get; set; } 
+        public int PriceAtPurchase { get; set; }
+        public int OrganizationId { get; set; }
         public ICollection<GiftInOrderModel> GiftsInPackage { get; set; } = new List<GiftInOrderModel>();
     }
 }

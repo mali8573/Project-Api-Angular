@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LotteryApi.Models
 {
-    public class PackageInCartModel
+    public class PackageInCartModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
@@ -14,8 +14,8 @@ namespace LotteryApi.Models
         public int CartId { get; set; }
         [ForeignKey("CartId")]
         public ShoppingCartModel ShoppingCart { get; set; }
-    
-       
+
+        public int OrganizationId { get; set; }
         public ICollection<GiftInCartModel> GiftsInPackage { get; set; } = new List<GiftInCartModel>();
 
     }

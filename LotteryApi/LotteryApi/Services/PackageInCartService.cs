@@ -1,4 +1,5 @@
 ﻿using LotteryApi.Dtos;
+using LotteryApi.Exceptions;
 using LotteryApi.Models;
 using LotteryApi.Repositories;
 using System.Security.Claims;
@@ -49,7 +50,7 @@ namespace LotteryApi.Services
             var userIdCalm = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdCalm))
             {
-                return null;
+                throw new UnauthorizedException("משתמש לא מחובר או חסר הרשאות.");
             }
             if (!int.TryParse(userIdCalm, out int userId))
             {
@@ -57,10 +58,10 @@ namespace LotteryApi.Services
             }
             var cart = await _ShoppingCartRepository.GetShoppingCartByUserIdAsync(userId);
             if (cart == null)
-                return null;
+                throw new NotFoundException("סל הקניות של המשתמש לא נמצא.");
             var package = await _packageRepository.GetPackageByIdAsync(packageInCart.PackageId);
             if (package == null)
-                return null;
+                throw new NotFoundException($"החבילה עם מזהה {packageInCart.PackageId} לא קיימת במערכת.");
             var newPackageInCart = new PackageInCartModel()
             {
                 PackageId = packageInCart.PackageId,
@@ -72,8 +73,7 @@ namespace LotteryApi.Services
             var createPackageInCart = await _packageInCartRepository.CreatePackageInCartAsync(newPackageInCart);
             var createPackageWithDetails = await _packageInCartRepository.GetPackageInCartByIdAsync(createPackageInCart.Id);
             if (createPackageWithDetails == null)
-                return null;
-
+                throw new BadRequestException("אירעה שגיאה בשמירת החבילה בסל.");
             cart.SumPrice += package.Price;
             await _ShoppingCartRepository.UpdateShoppingCartAsync(cart);
 

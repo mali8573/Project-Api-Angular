@@ -1,6 +1,7 @@
 ﻿using LotteryApi.Dtos;
 using LotteryApi.Enums;
 using LotteryApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,10 @@ namespace LotteryApi.Controllers
     [ApiController]
     public class GiftController : ControllerBase
     {
-        private readonly IGiftService _giftService ;
-        public GiftController(GiftService giftService)
+        private readonly IGiftService _giftService;
+        public GiftController(IGiftService giftService)
         {
-            _giftService =  giftService;
+            _giftService = giftService;
         }
 
         [HttpGet]
@@ -32,12 +33,14 @@ namespace LotteryApi.Controllers
             }
             return Ok(gift);
         }
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<ActionResult<GiftDto>> CreateGiftAsync([FromBody] GiftCreateDto gift)
         {
             var newGift = await _giftService.CreateGiftAsync(gift);
             return Ok(newGift);
         }
+        [Authorize(Roles = "Manager")]
         [HttpPut("{id}")]
         public async Task<ActionResult<GiftDto>> UpdatePackageAsync(int id, [FromBody] GiftUpdateDto gift)
         {
@@ -48,6 +51,7 @@ namespace LotteryApi.Controllers
             }
             return Ok(updateGift);
         }
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteGiftAsync(int id)
         {

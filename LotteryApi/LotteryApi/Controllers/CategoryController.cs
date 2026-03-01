@@ -1,5 +1,6 @@
 ﻿using LotteryApi.Dtos;
 using LotteryApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,7 @@ namespace LotteryApi.Controllers
             _categoryService = categoryService;
         }
 
+      
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategoriesAsync()
         {
@@ -31,12 +33,14 @@ namespace LotteryApi.Controllers
             }
             return Ok(category);
         }
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<ActionResult<CategoryDto>> CreateCategoryAsync([FromBody] CategoryCreateDto category)
         {
             var newCategory=await _categoryService.CreateCategoryAsync(category);
             return Ok(newCategory);
         }
+        [Authorize(Roles = "Manager")]
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoryDto>> UpdateCategoryAsync(int id, [FromBody] CategoryUpdateDto category)
         {
@@ -47,6 +51,7 @@ namespace LotteryApi.Controllers
             }
             return Ok(updateCategory);
         }
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCategoryAsync(int id)
         {

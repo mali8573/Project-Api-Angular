@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LotteryApi.Models
 {
-    public class ShoppingCartModel
+    public class ShoppingCartModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
@@ -16,5 +16,6 @@ namespace LotteryApi.Models
 
         [Required]
         public int SumPrice { get; set; }= 0;
+        public int OrganizationId { get; set; }
     }
 }

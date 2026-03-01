@@ -1,6 +1,7 @@
 ﻿using LotteryApi.Dtos;
 using LotteryApi.Models;
 using LotteryApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace LotteryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Manager")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -20,12 +22,13 @@ namespace LotteryApi.Controllers
             _userService = userService;
            // _logger = logger;
         }
-
+       
         [HttpGet]
         
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
         {
             var users = await _userService.GetUsersAsync();
+
             return Ok(users);
         }
 

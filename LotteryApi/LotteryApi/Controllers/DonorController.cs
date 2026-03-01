@@ -1,6 +1,7 @@
 ﻿using LotteryApi.Dtos;
 using LotteryApi.Models;
 using LotteryApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,11 @@ namespace LotteryApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Manager")]
     public class DonorController : ControllerBase
     {
         private readonly IDonorService _donorService ;
-        DonorController(DonorService donorService)
+         public DonorController(IDonorService donorService)
         {
             _donorService =  donorService;
         }

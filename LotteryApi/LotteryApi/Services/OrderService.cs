@@ -8,10 +8,13 @@ namespace LotteryApi.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IShoppingCartRepository _shoppingCartRepository;
-        public OrderService(IOrderRepository orderRepository, IShoppingCartRepository shoppingCartRepository)
+        private readonly ILogger<OrderService> _logger; 
+
+        public OrderService(IOrderRepository orderRepository, IShoppingCartRepository shoppingCartRepository, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _shoppingCartRepository = shoppingCartRepository;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<OrderDto>> GetOrdersAsync()
@@ -80,6 +83,8 @@ namespace LotteryApi.Services
 
         public async Task<OrderDto> CreateShoppingCartAsync(ShoppingCartDto shoppingcart)
         {
+            _logger.LogInformation("Processing checkout for ShoppingCart {CartId} (Participant: {UserId})",
+        shoppingcart.Id, shoppingcart.ParticipantId);
             var newOrder = new OrderModel()
             {
 
@@ -103,7 +108,10 @@ namespace LotteryApi.Services
             };
 
             var createOrder = await _orderRepository.CreateOrderAsync(newOrder);
+            _logger.LogInformation("Order {OrderId} created successfully. Emptying cart {CartId}...",
+        createOrder.Id, shoppingcart.Id);
             await _shoppingCartRepository.EmptyCartAsync(shoppingcart.Id);
+            _logger.LogInformation("Checkout completed for Order {OrderId}", createOrder.Id);
             return await GetOrderByIdAsync(createOrder.Id);
         }
     }

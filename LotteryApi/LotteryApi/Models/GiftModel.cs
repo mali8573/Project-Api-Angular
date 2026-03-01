@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LotteryApi.Models
 {
-    public class GiftModel
+    public class GiftModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
@@ -24,6 +24,7 @@ namespace LotteryApi.Models
         public int DonorId { get; set; }
         [ForeignKey("DonorId")]
         public DonorModel Donor { get; set; }
+        public int OrganizationId { get; set; }
         public ICollection<GiftInOrderModel> GifPurchased { get; set; } = new List<GiftInOrderModel>();
 
 

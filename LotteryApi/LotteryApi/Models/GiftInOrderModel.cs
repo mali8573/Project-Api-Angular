@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LotteryApi.Models
 {
-    public class GiftInOrderModel
+    public class GiftInOrderModel: ITenantEntity
     {
         public int Id { get; set; }
         [Required]
@@ -15,9 +15,10 @@ namespace LotteryApi.Models
         [ForeignKey("PackageInOrderId")]
         public PackageInOrderModel PackageInOrder { get; set; }
         [Required]
-       // public int OrderId { get; set; }
-       // [ForeignKey("OrderId")]
-      //  public OrderModel Order { get; set; }
+        // public int OrderId { get; set; }
+        // [ForeignKey("OrderId")]
+        //  public OrderModel Order { get; set; }
+        public int OrganizationId { get; set; }
         public bool IsWinner { get; set; } = false;
     }
 }

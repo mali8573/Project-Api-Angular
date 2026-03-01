@@ -1,19 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace LotteryApi.Data
 {
-    public class LotteryDBFactory
+    // שימוש בממשק הרשמי של EF Core ליצירת Context בזמן פיתוח
+    public class LotteryDbContextFactory : IDesignTimeDbContextFactory<LotteryDbContext>
     {
-        private const string ConnectionString = "Server=DESKTOP-1L8084V\\SQLEXPRESS;DataBase=LotteryDB;Integrated Security=SSPI;" +
-                    //private const string ConnectionString = "Server=Srv2\\pupils;DataBase=LotteryDB;Integrated Security=SSPI;" +
+        private const string ConnectionString = "Server=DESKTOP-1L8084V\\SQLEXPRESS;DataBase=NewLotteryDB;Integrated Security=SSPI;Persist Security Info=False;TrustServerCertificate=true";
 
-    "Persist Security Info=False;TrustServerCertificate=true";
-
-        public static LotteryDbContext CreateContext()
+        public LotteryDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<LotteryDbContext>();
             optionsBuilder.UseSqlServer(ConnectionString);
-            return new LotteryDbContext(optionsBuilder.Options);
+
+            // אנחנו שולחים null עבור ה-ITenantProvider כי בזמן יצירת Migration 
+            // אין HTTP Request ואין טוקן של משתמש. 
+            // ה-! אומר למהדר שאנחנו מודעים לכך שזה null.
+            return new LotteryDbContext(optionsBuilder.Options, null!);
         }
     }
 }

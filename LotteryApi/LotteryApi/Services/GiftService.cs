@@ -1,7 +1,9 @@
 ﻿using LotteryApi.Dtos;
 using LotteryApi.Enums;
+using LotteryApi.Exceptions;
 using LotteryApi.Models;
 using LotteryApi.Repositories;
+using Serilog;
 
 namespace LotteryApi.Services
 {
@@ -264,5 +266,57 @@ namespace LotteryApi.Services
                     }).ToList() ?? new List<GiftPurchaserDto>()
             });
         }
+        //public async Task<UserDto> RunLotteryForGiftAsync(int giftId)
+        //{
+        //    // 1. שליפת המתנה עם כל הכרטיסים שנקנו עבורה (GifPurchased)
+        //    var gift = await _giftRepository.GetGiftByIdAsync(giftId);
+
+        //    if (gift == null) throw new NotFoundException("מתנה לא נמצאה.");
+
+        //    // 2. בדיקה האם כבר יש כרטיס שסומן כ"זוכה" עבור המתנה הזו
+        //    var existingWinner = gift.GifPurchased.FirstOrDefault(gp => gp.IsWinner);
+        //    if (existingWinner != null)
+        //        throw new ConflictException($"כבר בוצעה הגרלה למתנה זו. הזוכה הוא: {existingWinner.PackageInOrder.Order.Participant.Name}");
+
+        //    // 3. איסוף כל הכרטיסים
+        //    var allTickets = gift.GifPurchased.ToList();
+        //    if (!allTickets.Any())
+        //        throw new BadRequestException("אין רוכשים למתנה זו, לא ניתן להגריל.");
+
+        //    // 4. הגרלה אקראית של כרטיס אחד
+        //    Random random = new Random();
+        //    var winningTicket = allTickets[random.Next(allTickets.Count)];
+
+        //    // 5. עדכון הכרטיס כ"זוכה" ושמירה ב-Database
+        //    winningTicket.IsWinner = true; // נניח שלשדה קוראים IsWinner
+        //    await _giftRepository.UpdatePurchaseAsync(winningTicket);
+
+        //    Log.Information("הגרלה הסתיימה! הזוכה במתנה {GiftName} הוא {User}", gift.Name, winningTicket.Order.User.FirstName);
+
+        //    return _mapper.Map<UserDTO>(winningTicket.Order.User);
+        //}
+        //// אופציה 2: הגרלת כל מה שנותר
+        //public async Task<List<LotteryResultDTO>> RunAllRemainingLotteriesAsync()
+        //{
+        //    var results = new List<LotteryResultDTO>();
+        //    // שליפת כל המתנות שעדיין אין להן זוכה
+        //    var pendingGifts = await _giftRepository.GetGiftsWithoutWinnersAsync();
+
+        //    foreach (var gift in pendingGifts)
+        //    {
+        //        try
+        //        {
+        //            var winner = await RunLotteryForGiftAsync(gift.Id);
+        //            results.Add(new LotteryResultDTO { GiftName = gift.Name, WinnerName = winner.UserName });
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // אם מתנה מסוימת נכשלה (למשל אין רוכשים), נרשום לוג ונמשיך לבאה בתור
+        //            Log.Warning("דילוג על הגרלת מתנה {GiftId}: {Message}", gift.Id, ex.Message);
+        //        }
+        //    }
+
+        //    return results;
+        //}
     }
 }
