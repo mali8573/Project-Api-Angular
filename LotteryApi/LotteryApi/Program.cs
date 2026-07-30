@@ -50,7 +50,7 @@ try
             Scheme = "Bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "длрйсе аъ диечп бфешои: Bearer {your_token}"
+            Description = "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: Bearer {your_token}"
         });
         options.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
@@ -79,7 +79,8 @@ try
     //    });
     builder.Services.AddHttpContextAccessor();
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-    var secretKey = jwtSettings["SecretKey"] ?? "YourFallbackVerySecretKey123!";
+    var secretKey = jwtSettings["SecretKey"]
+        ?? throw new InvalidOperationException("JwtSettings:SecretKey is not configured. Set it via 'dotnet user-secrets set \"JwtSettings:SecretKey\" \"<value>\"' locally or an environment variable in production.");
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,10 +90,10 @@ try
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true, // айоеъ щемз диечп
-                ValidateAudience = true, // айоеъ чдм дйтг
-                ValidateLifetime = true, // бгйчд щдиечп ма фв ъечу
-                ValidateIssuerSigningKey = true, // айоеъ зъйоъ диечп
+                ValidateIssuer = true, // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+                ValidateAudience = true, // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+                ValidateLifetime = true, // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
+                ValidateIssuerSigningKey = true, // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
                 ValidIssuer = jwtSettings["Issuer"],
                 ValidAudience = jwtSettings["Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
